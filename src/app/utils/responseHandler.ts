@@ -1,6 +1,6 @@
 import { Response } from 'express';
 
-const handleResponse = (
+const handleResponseSuccess = (
   res: Response,
   statusCode: number,
   success: boolean,
@@ -14,4 +14,19 @@ const handleResponse = (
   });
 };
 
-export default handleResponse;
+const handleError = (
+  res: Response,
+  error: unknown = null,
+  message: string = 'An error occurred',
+  statusCode: number = 500,
+) => {
+  res.status(statusCode).json({
+    success: false,
+    message,
+    error: (error as Error).message || 'Internal Server Error',
+  });
+};
+export const handleResponse = {
+  handleResponseSuccess,
+  handleError,
+};
