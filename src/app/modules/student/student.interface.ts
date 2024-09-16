@@ -1,6 +1,6 @@
 // 1. Create an interface representing a document in MongoDB.
 
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 export type Guardian = {
   fatherName: string;
@@ -26,6 +26,7 @@ export type LocalGuardian = {
 
 export type StudentInterface = {
   id: string;
+  user: Types.ObjectId;
   name: UserName;
   password: string;
   gender: 'male' | 'female';
@@ -39,7 +40,6 @@ export type StudentInterface = {
   gurdian: Guardian;
   localGuardians: LocalGuardian;
   profileImg?: string;
-  isActive?: 'active' | 'blocked';
   isDeleted?: boolean;
 };
 // For Creating Static Methods

@@ -7,8 +7,6 @@ import {
   StudentMethodsModel,
   UserName,
 } from './student.interface';
-import config from '../../config';
-import bcrypt from 'bcrypt';
 // 2. Create a Schema corresponding to the document interface.
 const userNameSchema = new Schema<UserName>({
   firstName: { type: String, required: true },
@@ -38,15 +36,16 @@ const guardianSchema = new Schema<Guardian>({
 const studentSchema = new Schema<StudentInterface, StudentMethodsModel>(
   {
     id: { type: String, required: [true, 'Id is required'], unique: true },
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'User Id is required'],
+      unique: true,
+      ref: 'User',
+    },
     name: {
       type: userNameSchema,
       required: [true, 'Name is required'],
       maxlength: [16, 'Password cannot be more than 16 characters'],
-    },
-    password: {
-      type: String,
-      required: [true, 'Password is required'],
-      select: true,
     },
     gender: {
       type: String,
@@ -82,11 +81,7 @@ const studentSchema = new Schema<StudentInterface, StudentMethodsModel>(
       required: [true, 'Local Guardians is required'],
     },
     profileImg: { type: String },
-    isActive: {
-      type: String,
-      enum: ['active', 'blocked'],
-      default: 'active',
-    },
+
     isDeleted: {
       type: Boolean,
       default: false,
@@ -106,22 +101,6 @@ studentSchema.virtual('fullName').get(function () {
 });
 
 // // Middleware configuration
-// Document Middlware configuration
-studentSchema.pre('save', async function (next) {
-  this.password = await bcrypt.hash(
-    this.password,
-    Number(config.bcrypt_salt_rounds),
-  );
-
-  // Ensure `isActive` and `isDeleted` fields have default values
-  if (!this.isActive) {
-    this.isActive = 'active';
-  }
-  if (this.isDeleted === undefined) {
-    this.isDeleted = false;
-  }
-  next();
-});
 
 studentSchema.post('save', function (doc, next) {
   next();
@@ -153,12 +132,6 @@ studentSchema.statics.isUserExist = async function (id: string) {
   const existingUser = await StudentModel.findOne({ id: id });
   return existingUser;
 };
-
-// // Creating an custome instance method
-// studentSchema.methods.isUserExist = async function (id: string) {
-//   const existingUser = await StudentModel.findOne({ id: id });
-//   return existingUser;
-// };
 
 // 3. Create a model using the schema.
 

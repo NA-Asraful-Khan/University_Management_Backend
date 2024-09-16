@@ -1,4 +1,3 @@
-//11:08
 export type UserInterface = {
   id: string;
   password: string;
