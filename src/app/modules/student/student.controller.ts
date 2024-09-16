@@ -1,13 +1,16 @@
 import { Request, Response } from 'express';
 import { StundentServices } from './student.service';
-import { handleResponse } from '../../../utils/responseHandler';
 import studentValidationSchema from './student.validation';
+import { z } from 'zod';
+import { handleResponse } from '../../utils/responseHandler';
 
 const createStudent = async (req: Request, res: Response) => {
   try {
     const { student: studentData } = req.body;
+
     // Validation
     const validateData = studentValidationSchema.parse(studentData);
+
     // Creating a new student
     const result = await StundentServices.createStudent(validateData);
 
@@ -19,6 +22,23 @@ const createStudent = async (req: Request, res: Response) => {
       result,
     );
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      const validationErrors = error.errors.map((err) => ({
+        errors: [
+          {
+            message: `${err.path.join('.')} is ${err.message}`,
+          },
+        ],
+      }));
+      return handleResponse.handleError(
+        res,
+        validationErrors[0],
+        'Failed to create student',
+        400,
+      );
+    }
+
+    // Handle other errors
     handleResponse.handleError(res, error, 'Failed to create student', 500);
   }
 };

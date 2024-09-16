@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose';
+
 import {
   Guardian,
   LocalGuardian,
@@ -6,6 +7,8 @@ import {
   StudentMethodsModel,
   UserName,
 } from './student.interface';
+import config from '../../config';
+import bcrypt from 'bcrypt';
 // 2. Create a Schema corresponding to the document interface.
 const userNameSchema = new Schema<UserName>({
   firstName: { type: String, required: true },
@@ -33,10 +36,16 @@ const guardianSchema = new Schema<Guardian>({
 });
 
 const studentSchema = new Schema<StudentInterface, StudentMethodsModel>({
-  id: { type: String, required: [true, 'Id is required'] },
+  id: { type: String, required: [true, 'Id is required'], unique: true },
   name: {
     type: userNameSchema,
     required: [true, 'Name is required'],
+    maxlength: [16, 'Password cannot be more than 16 characters'],
+  },
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+    select: true,
   },
   gender: {
     type: String,
@@ -79,6 +88,26 @@ const studentSchema = new Schema<StudentInterface, StudentMethodsModel>({
   },
 });
 
+// Middleware configuration
+
+studentSchema.pre('save', async function (next) {
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+  next();
+});
+
+studentSchema.post('save', function (doc, next) {
+  next();
+});
+
+// // Exclude password fields in Response
+studentSchema.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
 // // Creating a static method
 
 studentSchema.statics.isUserExist = async function (id: string) {
