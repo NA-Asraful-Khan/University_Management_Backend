@@ -1,5 +1,7 @@
 // 1. Create an interface representing a document in MongoDB.
 
+import { Model } from 'mongoose';
+
 export type Guardian = {
   fatherName: string;
   fatherOccupation: string;
@@ -11,7 +13,7 @@ export type Guardian = {
 
 export type UserName = {
   firstName: string;
-  middleName: string;
+  middleName?: string;
   lastName: string;
 };
 
@@ -30,7 +32,7 @@ export type StudentInterface = {
   email: string;
   contactNo: string;
   emergencyContactNo: string;
-  BloodGroup: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+  bloodGroup: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   presentAddress: string;
   permanentAddress: string;
   gurdian: Guardian;
@@ -38,3 +40,20 @@ export type StudentInterface = {
   profileImg?: string;
   isActive?: 'active' | 'blocked';
 };
+// For Creating Static Methods
+export interface StudentMethodsModel extends Model<StudentInterface> {
+  // eslint-disable-next-line no-unused-vars
+  isUserExist(id: string): Promise<StudentInterface | null>;
+}
+
+// For Creating Instance Methods
+// export type StudentMethods = {
+//   // eslint-disable-next-line no-unused-vars
+//   isUserExist(id: string): Promise<StudentInterface | null>;
+// };
+
+// export type StudentMethodsModel = Model<
+//   StudentInterface,
+//   Record<string, never>,
+//   StudentMethods
+// >;

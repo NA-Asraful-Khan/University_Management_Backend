@@ -1,11 +1,15 @@
 import { Request, Response } from 'express';
 import { StundentServices } from './student.service';
 import { handleResponse } from '../../../utils/responseHandler';
+import studentValidationSchema from './student.validation';
 
 const createStudent = async (req: Request, res: Response) => {
   try {
     const { student: studentData } = req.body;
-    const result = await StundentServices.createStudent(studentData);
+    // Validation
+    const validateData = studentValidationSchema.parse(studentData);
+    // Creating a new student
+    const result = await StundentServices.createStudent(validateData);
 
     handleResponse.handleResponseSuccess(
       res,

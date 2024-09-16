@@ -3,6 +3,7 @@ import {
   Guardian,
   LocalGuardian,
   StudentInterface,
+  StudentMethodsModel,
   UserName,
 } from './student.interface';
 // 2. Create a Schema corresponding to the document interface.
@@ -31,23 +32,69 @@ const guardianSchema = new Schema<Guardian>({
   motherContactNo: { type: String, required: true },
 });
 
-const studentSchema = new Schema<StudentInterface>({
-  id: { type: String },
-  name: userNameSchema,
-  gender: ['female', 'male'],
+const studentSchema = new Schema<StudentInterface, StudentMethodsModel>({
+  id: { type: String, required: [true, 'Id is required'] },
+  name: {
+    type: userNameSchema,
+    required: [true, 'Name is required'],
+  },
+  gender: {
+    type: String,
+    enum: ['female', 'male'],
+    required: [true, 'Gender is required'],
+  },
   dateOfBirth: { type: String },
   email: { type: String, required: true, unique: true },
   contactNo: { type: String, required: true },
-  emergencyContactNo: { type: String, required: true },
-  BloodGroup: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-  presentAddress: { type: String, required: true },
-  permanentAddress: { type: String, required: true },
-  gurdian: guardianSchema,
-  localGuardians: localGuardianSchema,
+  emergencyContactNo: {
+    type: String,
+    required: [true, 'Emergency Contact is Required'],
+  },
+  bloodGroup: {
+    type: String,
+    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+    required: [true, 'Blood Group is required'],
+  },
+  presentAddress: {
+    type: String,
+    required: [true, 'Present Address is Required'],
+  },
+  permanentAddress: {
+    type: String,
+    required: [true, 'Permanent Address is Required'],
+  },
+  gurdian: {
+    type: guardianSchema,
+    required: [true, 'Guardian is required'],
+  },
+  localGuardians: {
+    type: localGuardianSchema,
+    required: [true, 'Local Guardians is required'],
+  },
   profileImg: { type: String },
-  isActive: ['active', 'blocked'],
+  isActive: {
+    type: String,
+    enum: ['active', 'blocked'],
+    default: 'active',
+  },
 });
+
+// // Creating a static method
+
+studentSchema.statics.isUserExist = async function (id: string) {
+  const existingUser = await StudentModel.findOne({ id: id });
+  return existingUser;
+};
+
+// // Creating an custome instance method
+// studentSchema.methods.isUserExist = async function (id: string) {
+//   const existingUser = await StudentModel.findOne({ id: id });
+//   return existingUser;
+// };
 
 // 3. Create a model using the schema.
 
-export const StudentModel = model<StudentInterface>('Student', studentSchema);
+export const StudentModel = model<StudentInterface, StudentMethodsModel>(
+  'Student',
+  studentSchema,
+);
