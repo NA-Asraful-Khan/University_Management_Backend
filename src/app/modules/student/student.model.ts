@@ -35,61 +35,74 @@ const guardianSchema = new Schema<Guardian>({
   motherContactNo: { type: String, required: true },
 });
 
-const studentSchema = new Schema<StudentInterface, StudentMethodsModel>({
-  id: { type: String, required: [true, 'Id is required'], unique: true },
-  name: {
-    type: userNameSchema,
-    required: [true, 'Name is required'],
-    maxlength: [16, 'Password cannot be more than 16 characters'],
+const studentSchema = new Schema<StudentInterface, StudentMethodsModel>(
+  {
+    id: { type: String, required: [true, 'Id is required'], unique: true },
+    name: {
+      type: userNameSchema,
+      required: [true, 'Name is required'],
+      maxlength: [16, 'Password cannot be more than 16 characters'],
+    },
+    password: {
+      type: String,
+      required: [true, 'Password is required'],
+      select: true,
+    },
+    gender: {
+      type: String,
+      enum: ['female', 'male'],
+      required: [true, 'Gender is required'],
+    },
+    dateOfBirth: { type: String },
+    email: { type: String, required: true, unique: true },
+    contactNo: { type: String, required: true },
+    emergencyContactNo: {
+      type: String,
+      required: [true, 'Emergency Contact is Required'],
+    },
+    bloodGroup: {
+      type: String,
+      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+      required: [true, 'Blood Group is required'],
+    },
+    presentAddress: {
+      type: String,
+      required: [true, 'Present Address is Required'],
+    },
+    permanentAddress: {
+      type: String,
+      required: [true, 'Permanent Address is Required'],
+    },
+    gurdian: {
+      type: guardianSchema,
+      required: [true, 'Guardian is required'],
+    },
+    localGuardians: {
+      type: localGuardianSchema,
+      required: [true, 'Local Guardians is required'],
+    },
+    profileImg: { type: String },
+    isActive: {
+      type: String,
+      enum: ['active', 'blocked'],
+      default: 'active',
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-    select: true,
+  {
+    toJSON: {
+      virtuals: true,
+    },
   },
-  gender: {
-    type: String,
-    enum: ['female', 'male'],
-    required: [true, 'Gender is required'],
-  },
-  dateOfBirth: { type: String },
-  email: { type: String, required: true, unique: true },
-  contactNo: { type: String, required: true },
-  emergencyContactNo: {
-    type: String,
-    required: [true, 'Emergency Contact is Required'],
-  },
-  bloodGroup: {
-    type: String,
-    enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-    required: [true, 'Blood Group is required'],
-  },
-  presentAddress: {
-    type: String,
-    required: [true, 'Present Address is Required'],
-  },
-  permanentAddress: {
-    type: String,
-    required: [true, 'Permanent Address is Required'],
-  },
-  gurdian: {
-    type: guardianSchema,
-    required: [true, 'Guardian is required'],
-  },
-  localGuardians: {
-    type: localGuardianSchema,
-    required: [true, 'Local Guardians is required'],
-  },
-  profileImg: { type: String },
-  isActive: {
-    type: String,
-    enum: ['active', 'blocked'],
-    default: 'active',
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
+);
+
+// // Virtual Fiels
+
+studentSchema.virtual('fullName').get(function () {
+  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
 });
 
 // // Middleware configuration
@@ -120,9 +133,16 @@ studentSchema.pre<Query<any, any>>(/^find/, function (next) {
   this.where({ isDeleted: { $ne: true } });
   next();
 });
+
+studentSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+
+  next();
+});
+
 // // Exclude password fields in Response
 studentSchema.methods.toJSON = function () {
-  const obj = this.toObject();
+  const obj = this.toObject({ virtuals: true });
   delete obj.password;
   delete obj.isDeleted;
   return obj;

@@ -62,17 +62,13 @@ const getSingleStudent = async (req: Request, res: Response) => {
   try {
     const { studentId } = req.params;
     const result = await StundentServices.getSingleStudent(studentId);
-    if (result) {
-      handleResponse.handleResponseSuccess(
-        res,
-        200,
-        true,
-        'Student Get successfully',
-        result,
-      );
-    } else {
-      throw new Error('User not Found With this ID');
-    }
+    handleResponse.handleResponseSuccess(
+      res,
+      200,
+      true,
+      'Student Get successfully',
+      result,
+    );
   } catch (error) {
     handleResponse.handleError(res, error, 'Error getting student', 500);
   }
@@ -82,17 +78,13 @@ const deleteStudent = async (req: Request, res: Response) => {
   try {
     const { studentId } = req.params;
     const result = await StundentServices.deleteStudent(studentId);
-    if (result) {
-      handleResponse.handleResponseSuccess(
-        res,
-        200,
-        true,
-        'Student Delete successfully',
-        result,
-      );
-    } else {
-      throw new Error('User not Found With this ID');
-    }
+    handleResponse.handleResponseSuccess(
+      res,
+      200,
+      true,
+      'Student Delete successfully',
+      result,
+    );
   } catch (error) {
     handleResponse.handleError(res, error, 'Error Deleting student', 500);
   }
