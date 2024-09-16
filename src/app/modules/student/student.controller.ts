@@ -71,15 +71,30 @@ const getSingleStudent = async (req: Request, res: Response) => {
         result,
       );
     } else {
-      handleResponse.handleError(
-        res,
-        'Student Not Found with this ID',
-        'Student not found',
-        404,
-      );
+      throw new Error('User not Found With this ID');
     }
   } catch (error) {
     handleResponse.handleError(res, error, 'Error getting student', 500);
+  }
+};
+
+const deleteStudent = async (req: Request, res: Response) => {
+  try {
+    const { studentId } = req.params;
+    const result = await StundentServices.deleteStudent(studentId);
+    if (result) {
+      handleResponse.handleResponseSuccess(
+        res,
+        200,
+        true,
+        'Student Delete successfully',
+        result,
+      );
+    } else {
+      throw new Error('User not Found With this ID');
+    }
+  } catch (error) {
+    handleResponse.handleError(res, error, 'Error Deleting student', 500);
   }
 };
 
@@ -87,4 +102,5 @@ export const StudentController = {
   createStudent,
   getAllStudents,
   getSingleStudent,
+  deleteStudent,
 };

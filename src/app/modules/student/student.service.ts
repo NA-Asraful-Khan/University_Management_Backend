@@ -28,9 +28,14 @@ const getSingleStudent = async (id: string) => {
   const result = await StudentModel.findOne({ id: id });
   return result;
 };
+const deleteStudent = async (id: string) => {
+  const result = await StudentModel.updateOne({ id: id }, { isDeleted: true });
+  return result;
+};
 
 export const StundentServices = {
   createStudent,
   getAllStudents,
   getSingleStudent,
+  deleteStudent,
 };

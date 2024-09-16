@@ -40,6 +40,7 @@ export type StudentInterface = {
   localGuardians: LocalGuardian;
   profileImg?: string;
   isActive?: 'active' | 'blocked';
+  isDeleted?: boolean;
 };
 // For Creating Static Methods
 export interface StudentMethodsModel extends Model<StudentInterface> {

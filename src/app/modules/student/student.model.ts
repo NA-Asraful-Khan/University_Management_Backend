@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Query, Schema, model } from 'mongoose';
 
 import {
   Guardian,
@@ -86,15 +86,27 @@ const studentSchema = new Schema<StudentInterface, StudentMethodsModel>({
     enum: ['active', 'blocked'],
     default: 'active',
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-// Middleware configuration
-
+// // Middleware configuration
+// Document Middlware configuration
 studentSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(
     this.password,
     Number(config.bcrypt_salt_rounds),
   );
+
+  // Ensure `isActive` and `isDeleted` fields have default values
+  if (!this.isActive) {
+    this.isActive = 'active';
+  }
+  if (this.isDeleted === undefined) {
+    this.isDeleted = false;
+  }
   next();
 });
 
@@ -102,10 +114,17 @@ studentSchema.post('save', function (doc, next) {
   next();
 });
 
+// Query Middleware Configuration
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+studentSchema.pre<Query<any, any>>(/^find/, function (next) {
+  this.where({ isDeleted: { $ne: true } });
+  next();
+});
 // // Exclude password fields in Response
 studentSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
+  delete obj.isDeleted;
   return obj;
 };
 // // Creating a static method
