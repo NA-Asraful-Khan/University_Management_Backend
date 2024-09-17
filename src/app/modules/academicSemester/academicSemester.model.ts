@@ -44,16 +44,17 @@ const academicSemesterSchema = new Schema<TAcademicSemester>(
 // // Middleware configuration
 // Document Middlware configuration
 academicSemesterSchema.pre('save', async function (next) {
+  const isSemesterExist = await AcademicSemesterModel.findOne({
+    year: this.year,
+    name: this.name,
+  });
+
+  if (isSemesterExist) {
+    throw new Error('Semester already exists for this Year.');
+  }
   next();
 });
 
-// // Exclude password fields in Response
-academicSemesterSchema.methods.toJSON = function () {
-  const obj = this.toObject({ virtuals: true });
-  delete obj.password;
-  delete obj.isDeleted;
-  return obj;
-};
 // 3. Create a model using the schema.
 export const AcademicSemesterModel = model<TAcademicSemester>(
   'AcademicSemester',
