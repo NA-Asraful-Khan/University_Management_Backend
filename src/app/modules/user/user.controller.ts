@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import { handleResponse } from '../../utils/responseHandler';
 // import { z } from 'zod';
@@ -15,6 +16,12 @@ const createStudent = async (
     // const validateData = studentValidationSchema.parse(studentData);
 
     // Creating a new student
+
+    if (!studentData) {
+      const error = new Error('Student data are required');
+      (error as any).statusCode = 400; // Custom status code
+      throw error;
+    }
     const result = await UserServices.createStudent(password, studentData);
 
     handleResponse.handleResponseSuccess(

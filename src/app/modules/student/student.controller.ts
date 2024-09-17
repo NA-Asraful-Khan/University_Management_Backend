@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import { StundentServices } from './student.service';
 
@@ -30,9 +31,14 @@ const getSingleStudent = async (
   try {
     const { studentId } = req.params;
     const result = await StundentServices.getSingleStudent(studentId);
+    if (!result) {
+      const error = new Error('Student Not Found With This ID');
+      (error as any).statusCode = 401;
+      throw error;
+    }
     handleResponse.handleResponseSuccess(
       res,
-      200,
+      201,
       true,
       'Student Get successfully',
       result,
@@ -50,6 +56,12 @@ const deleteStudent = async (
   try {
     const { studentId } = req.params;
     const result = await StundentServices.deleteStudent(studentId);
+
+    if (result.modifiedCount === 0) {
+      const error = new Error('Student Not Found With This ID');
+      (error as any).statusCode = 401;
+      throw error;
+    }
     handleResponse.handleResponseSuccess(
       res,
       200,
