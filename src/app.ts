@@ -3,10 +3,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import express, { Application, NextFunction, Request, Response } from 'express';
 import cors from 'cors';
-import { StudentRoutes } from './app/modules/student/student.route';
-import { UserRoutes } from './app/modules/user/user.route';
 import globalErrorHandler from './app/middleware/globalErrorHandler';
 import notFound from './app/middleware/notFound';
+import router from './app/routes';
 
 const app: Application = express();
 
@@ -16,14 +15,9 @@ app.use(cors());
 
 //ApplicationRoute
 
-app.use('/api/v1/students', StudentRoutes);
-app.use('/api/v1/users', UserRoutes);
+app.use('/api/v1', router);
 
 app.use(globalErrorHandler);
 app.use(notFound);
-// app.get('/', (req: Request, res: Response) => {
-//   const a = 10;
-//   res.send(a);
-// });
 
 export default app;
