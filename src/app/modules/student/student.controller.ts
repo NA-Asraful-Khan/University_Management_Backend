@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express';
 import { StundentServices } from './student.service';
 
 import { handleResponse } from '../../utils/responseHandler';
+import httpStatus from 'http-status';
 
 const getAllStudents = async (
   req: Request,
@@ -11,13 +12,13 @@ const getAllStudents = async (
 ) => {
   try {
     const result = await StundentServices.getAllStudents();
-    handleResponse.handleResponseSuccess(
-      res,
-      200,
-      true,
-      'Students Get successfully',
-      result,
-    );
+
+    handleResponse.sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Studdents Get successfully',
+      data: result,
+    });
   } catch (error) {
     next(error);
   }
@@ -36,13 +37,13 @@ const getSingleStudent = async (
       (error as any).statusCode = 401;
       throw error;
     }
-    handleResponse.handleResponseSuccess(
-      res,
-      201,
-      true,
-      'Student Get successfully',
-      result,
-    );
+
+    handleResponse.sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Student Get successfully',
+      data: result,
+    });
   } catch (error) {
     next(error);
   }
@@ -62,13 +63,11 @@ const deleteStudent = async (
       (error as any).statusCode = 401;
       throw error;
     }
-    handleResponse.handleResponseSuccess(
-      res,
-      200,
-      true,
-      'Student Delete successfully',
-      result,
-    );
+    handleResponse.sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Student Delete successfully',
+    });
   } catch (error) {
     next(error);
   }
