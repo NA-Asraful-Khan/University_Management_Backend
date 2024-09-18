@@ -40,6 +40,7 @@ export type StudentInterface = {
   gurdian: Guardian;
   localGuardians: LocalGuardian;
   profileImg?: string;
+  admissionSemester: Types.ObjectId;
   isDeleted?: boolean;
 };
 // For Creating Static Methods
