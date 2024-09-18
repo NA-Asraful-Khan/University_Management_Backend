@@ -54,7 +54,11 @@ const updateAcademicSemester = catchAsync(async (req, res) => {
     semesterId,
     req.body,
   );
-
+  if (!result) {
+    const error = new Error('Semester Not Found With This ID');
+    (error as any).statusCode = 401;
+    throw error;
+  }
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

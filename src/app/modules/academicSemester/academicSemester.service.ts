@@ -1,4 +1,8 @@
-import { academicSemesterNameCodeMapper } from './academicSemester.constant';
+import {
+  academicSemesterNameCodeMapper,
+  checkIfSemesterExists,
+  validateSemesterCode,
+} from './academicSemester.constant';
 import { TAcademicSemester } from './academicSemester.interface';
 import { AcademicSemesterModel } from './academicSemester.model';
 
@@ -45,12 +49,33 @@ const updateAcademicSemester = async (
   id: string,
   payload: Partial<TAcademicSemester>,
 ) => {
-  if (
-    payload.name &&
-    payload.code &&
-    academicSemesterNameCodeMapper[payload.name] != payload.code
-  ) {
-    throw new Error('Invalid Semester Code');
+  const academicSemesterData = await AcademicSemesterModel.findOne({ _id: id });
+
+  // Main logic
+  if (payload.name || payload.code || payload.year) {
+    // Check for semester existence by year and name
+    if (payload.year) {
+      await checkIfSemesterExists(
+        payload.year,
+        payload.name ?? academicSemesterData?.name,
+      );
+    }
+
+    // Validate code and name if both are present
+    if (payload.name && payload.code) {
+      validateSemesterCode(payload.name, payload.code);
+    } else if (payload.name) {
+      if (
+        academicSemesterNameCodeMapper[payload.name] !==
+        academicSemesterData?.code
+      ) {
+        throw new Error('Invalid Semester Name');
+      }
+    } else if (payload.code) {
+      if (academicSemesterData?.name) {
+        validateSemesterCode(academicSemesterData.name, payload.code);
+      }
+    }
   }
 
   const result = await AcademicSemesterModel.findOneAndUpdate(
