@@ -1,12 +1,22 @@
 import { StudentModel } from './student.model';
 
 const getAllStudents = async () => {
-  const result = await StudentModel.find();
+  const result = await StudentModel.find()
+    .populate('admissionSemester')
+    .populate({
+      path: 'academicDepertment',
+      populate: { path: 'academicFaculty' },
+    });
   return result;
 };
 
 const getSingleStudent = async (id: string) => {
-  const result = await StudentModel.findOne({ id: id });
+  const result = await StudentModel.findOne({ id: id })
+    .populate('admissionSemester')
+    .populate({
+      path: 'academicDepertment',
+      populate: { path: 'academicFaculty' },
+    });
 
   return result;
 };

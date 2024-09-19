@@ -5,6 +5,7 @@ import { handleResponse } from '../../utils/responseHandler';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import { AcademicSemesterServices } from './academicSemester.service';
+import AppError from '../../errors/AppError';
 
 const createAcademicSemester = catchAsync(async (req, res) => {
   const result = await AcademicSemesterServices.createAcademicSemester(
@@ -35,9 +36,7 @@ const getSingleAcademicSemester = catchAsync(async (req, res) => {
   const result =
     await AcademicSemesterServices.getSingleAcademicSemester(semesterId);
   if (!result) {
-    const error = new Error('Semester Not Found With This ID');
-    (error as any).statusCode = 401;
-    throw error;
+    throw new AppError(httpStatus.NOT_FOUND, 'Semester Not Found With This ID');
   }
 
   handleResponse.sendResponse(res, {
@@ -55,14 +54,12 @@ const updateAcademicSemester = catchAsync(async (req, res) => {
     req.body,
   );
   if (!result) {
-    const error = new Error('Semester Not Found With This ID');
-    (error as any).statusCode = 401;
-    throw error;
+    throw new AppError(httpStatus.NOT_FOUND, 'Semester Not Found With This ID');
   }
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Academic semester is retrieved succesfully',
+    message: 'Semester is Update succesfully',
     data: result,
   });
 });

@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import { handleResponse } from '../../utils/responseHandler';
 import { AcademicFacultyServices } from './academicFaculty.service';
+import AppError from '../../errors/AppError';
 
 const createAcademicFaculty = catchAsync(async (req, res) => {
   const result = await AcademicFacultyServices.createAcademicFaculty(req.body);
@@ -29,9 +30,10 @@ const getSingleAcademicFaculty = catchAsync(async (req, res) => {
   const result =
     await AcademicFacultyServices.getSingleAcademicFaculty(facultyId);
   if (!result) {
-    const error = new Error('Academic Faculty Not Found With This ID');
-    (error as any).statusCode = 401;
-    throw error;
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'Academic Faculty Not Found With This ID',
+    );
   }
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -48,9 +50,10 @@ const updateAcademicFaculty = catchAsync(async (req, res) => {
     req.body,
   );
   if (!result) {
-    const error = new Error('Academic Faculty Not Found With This ID');
-    (error as any).statusCode = 401;
-    throw error;
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      'Academic Faculty Not Found With This ID',
+    );
   }
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.OK,

@@ -5,6 +5,7 @@ import { handleResponse } from '../../utils/responseHandler';
 import { UserServices } from './user.service';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
+import AppError from '../../errors/AppError';
 
 const createStudent = catchAsync(async (req, res) => {
   const { password, student: studentData } = req.body;
@@ -12,9 +13,7 @@ const createStudent = catchAsync(async (req, res) => {
   // Creating a new student
 
   if (!studentData) {
-    const error = new Error('Student data are required');
-    (error as any).statusCode = httpStatus.NOT_FOUND; // Custom status code
-    throw error;
+    throw new AppError(403, 'Student data are required');
   }
   const result = await UserServices.createStudent(password, studentData);
 

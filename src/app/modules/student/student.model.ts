@@ -85,6 +85,10 @@ const studentSchema = new Schema<StudentInterface, StudentMethodsModel>(
       type: Schema.Types.ObjectId,
       ref: 'AcademicSemester',
     },
+    academicDepertment: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicDepertment',
+    },
     isDeleted: {
       type: Boolean,
       default: false,

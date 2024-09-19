@@ -1,3 +1,5 @@
+import httpStatus from 'http-status';
+import AppError from '../../errors/AppError';
 import {
   TAcademicSemesterCode,
   TAcademicSemesterName,
@@ -38,13 +40,16 @@ export const academicSemesterNameCodeMapper: TAcademicSemesterNameCodeMapper = {
 export const checkIfSemesterExists = async (year: string, name?: string) => {
   const semester = await AcademicSemesterModel.findOne({ year, name });
   if (semester) {
-    throw new Error('Semester already exists for this Year.');
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'Semester already exists for this Year.',
+    );
   }
 };
 
 // Helper function to validate semester code
 export const validateSemesterCode = (name: string, code: string) => {
   if (academicSemesterNameCodeMapper[name] !== code) {
-    throw new Error('Invalid Semester Code');
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid Semester Code');
   }
 };

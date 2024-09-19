@@ -19,7 +19,5 @@ router.get(
   AcademicSemesterController.getSingleAcademicSemester,
 );
 router.put('/:semesterId', AcademicSemesterController.updateAcademicSemester);
-// router.get('/:studentId', StudentController.getSingleStudent);
-// router.delete('/:studentId', StudentController.deleteStudent);
 
 export const AcademicSemesterRoutes = router;
