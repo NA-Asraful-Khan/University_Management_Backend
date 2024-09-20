@@ -46,13 +46,12 @@ const createStudent = async (
     if (!newStudent.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Student');
     }
-    console.log(newStudent);
+
     await session.commitTransaction();
     await session.endSession();
 
     return newStudent;
   } catch (err) {
-    console.log(err);
     await session.abortTransaction();
     await session.endSession();
     throw new AppError(500, 'Error creating student');

@@ -33,11 +33,8 @@ const getSingleStudent = catchAsync(async (req, res) => {
 
 const deleteStudent = catchAsync(async (req, res) => {
   const { studentId } = req.params;
-  const result = await StundentServices.deleteStudent(studentId);
+  await StundentServices.deleteStudent(studentId);
 
-  if (result.modifiedCount === 0) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Student Not Found With This ID');
-  }
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
