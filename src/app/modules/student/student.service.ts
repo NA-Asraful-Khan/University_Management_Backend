@@ -3,6 +3,7 @@ import { StudentModel } from './student.model';
 import AppError from '../../errors/AppError';
 import { UserModel } from '../user/user.model';
 import httpStatus from 'http-status';
+import { StudentInterface } from './student.interface';
 
 const getAllStudents = async () => {
   const result = await StudentModel.find()
@@ -26,6 +27,46 @@ const getSingleStudent = async (id: string) => {
 
   return result;
 };
+
+const updateStudent = async (
+  id: string,
+  payload: Partial<StudentInterface>,
+) => {
+  const { name, gurdian, localGuardians, ...remainingStudentData } = payload;
+
+  const modifiedUpdatedData: Record<string, unknown> = {
+    ...remainingStudentData,
+  };
+
+  if (name && Object.keys(name).length) {
+    for (const [key, value] of Object.entries(name)) {
+      modifiedUpdatedData[`name.${key}`] = value;
+    }
+  }
+
+  if (gurdian && Object.keys(gurdian).length) {
+    for (const [key, value] of Object.entries(gurdian)) {
+      modifiedUpdatedData[`gurdian.${key}`] = value;
+    }
+  }
+
+  if (localGuardians && Object.keys(localGuardians).length) {
+    for (const [key, value] of Object.entries(localGuardians)) {
+      modifiedUpdatedData[`localGuardians.${key}`] = value;
+    }
+  }
+
+  const result = await StudentModel.findOneAndUpdate(
+    { id: id },
+    modifiedUpdatedData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+  return result;
+};
+
 const deleteStudent = async (id: string) => {
   const session = await mongoose.startSession();
   const checkStudentAndUserExist = await StudentModel.isUserExist(id);
@@ -69,5 +110,6 @@ const deleteStudent = async (id: string) => {
 export const StundentServices = {
   getAllStudents,
   getSingleStudent,
+  updateStudent,
   deleteStudent,
 };
