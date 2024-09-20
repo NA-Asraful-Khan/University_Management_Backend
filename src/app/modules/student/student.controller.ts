@@ -7,7 +7,7 @@ import catchAsync from '../../utils/catchAsync';
 import AppError from '../../errors/AppError';
 
 const getAllStudents = catchAsync(async (req, res) => {
-  const result = await StundentServices.getAllStudents();
+  const result = await StundentServices.getAllStudents(req.query);
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
