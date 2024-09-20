@@ -17,6 +17,16 @@ app.use(cors());
 
 app.use('/api/v1', router);
 
+// Testing Route
+
+const welcome = async (req: Request, res: Response) => {
+  res.send('Welcome to University Management Api');
+};
+
+app.get('/', welcome);
+
+// Error Handling Middleware
+
 app.use(globalErrorHandler);
 app.use(notFound);
 
