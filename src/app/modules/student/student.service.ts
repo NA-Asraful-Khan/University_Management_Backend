@@ -7,23 +7,53 @@ import { StudentInterface } from './student.interface';
 
 const getAllStudents = async (query: Record<string, unknown>) => {
   let searchField = '';
+  const studentSearchableField = [
+    'id',
+    'email',
+    'name.firstName',
+    'presentAddress',
+  ];
+  const queryObj = { ...query };
 
   if (query?.searchField) {
     searchField = query.searchField as string;
   }
 
-  const result = await StudentModel.find({
-    $or: ['email', 'name.firstName', 'presentAddress'].map((field) => ({
+  const searchQuery = StudentModel.find({
+    $or: studentSearchableField.map((field) => ({
       [field]: { $regex: searchField, $options: 'i' },
     })),
-  })
+  });
+
+  const excludeFields = ['searchField', 'sort', 'limit'];
+  excludeFields.forEach((el) => {
+    delete queryObj[el];
+  });
+
+  const filterQuery = searchQuery
+    .find(queryObj)
     .populate('user')
     .populate('admissionSemester')
     .populate({
       path: 'academicDepertment',
       populate: { path: 'academicFaculty' },
     });
-  return result;
+
+  let sort = '-createdAt';
+
+  if (query.sort) {
+    sort = query.sort as string;
+  }
+
+  const sortQuery = filterQuery.sort(sort);
+
+  let limit = 1;
+  if (query.limit) {
+    limit = query.limit as number;
+  }
+
+  const limitQuery = sortQuery.limit(limit);
+  return limitQuery;
 };
 
 const getSingleStudent = async (id: string) => {
