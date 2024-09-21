@@ -4,11 +4,36 @@ import AppError from '../../errors/AppError';
 import { UserModel } from '../user/user.model';
 import httpStatus from 'http-status';
 import { StudentInterface } from './student.interface';
-import QueryBuilder from '../../builder/QueryBuilder';
-import { studentSearchableField } from './student.constant';
 
-const getAllStudents = async () => {
-  const result = await StudentModel.find()
+const getAllStudents = async (query: Record<string, unknown>) => {
+  let searchField = '';
+  const studentSearchableField = [
+    'id',
+    'email',
+    'name.firstName',
+    'presentAddress',
+  ];
+  const queryObj = { ...query };
+
+  if (query?.searchField) {
+    searchField = query.searchField as string;
+  }
+
+  // Search Query
+  const searchQuery = StudentModel.find({
+    $or: studentSearchableField.map((field) => ({
+      [field]: { $regex: searchField, $options: 'i' },
+    })),
+  });
+
+  //filtering query
+  const excludeFields = ['searchField', 'sort', 'limit', 'page', 'fields'];
+  excludeFields.forEach((el) => {
+    delete queryObj[el];
+  });
+
+  const filterQuery = searchQuery
+    .find(queryObj)
     .populate('user')
     .populate('admissionSemester')
     .populate({
@@ -16,20 +41,43 @@ const getAllStudents = async () => {
       populate: { path: 'academicFaculty' },
     });
 
-  return result;
-};
+  // Sort Query
+  let sort = '_id';
 
-const getStudentPaginationQuery = async (query: Record<string, unknown>) => {
-  const studentQuery = new QueryBuilder(StudentModel.find(), query)
-    .search(studentSearchableField)
-    .filter()
-    .sort()
-    .paginate()
-    .fields();
+  if (query.sort) {
+    sort = query.sort as string;
+  }
 
-  const result = await studentQuery.modelQuery;
+  const sortQuery = filterQuery.sort(sort);
 
-  return result;
+  // Pagination Query and Limit Query
+  let page = 1;
+  let limit = 3; // This looks unusually small, probably you want a larger default like 10
+  let skip = 0;
+
+  if (query.limit) {
+    limit = query.limit as number;
+  }
+
+  if (query.page) {
+    page = query.page as number;
+    skip = (page - 1) * limit;
+  }
+
+  const paginateQuery = sortQuery.skip(skip).limit(limit);
+
+  const limitQuery = paginateQuery.limit(limit);
+
+  //Fields Query
+
+  let fields = '-__v';
+
+  if (query.fields) {
+    fields = (query.fields as string).split(',').join(' ');
+  }
+
+  const fieldQuery = await limitQuery.select(fields);
+  return fieldQuery;
 };
 
 const getSingleStudent = async (id: string) => {
@@ -125,7 +173,6 @@ const deleteStudent = async (id: string) => {
 };
 export const StundentServices = {
   getAllStudents,
-  getStudentPaginationQuery,
   getSingleStudent,
   updateStudent,
   deleteStudent,

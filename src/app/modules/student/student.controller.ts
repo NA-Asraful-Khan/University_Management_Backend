@@ -7,7 +7,17 @@ import catchAsync from '../../utils/catchAsync';
 import AppError from '../../errors/AppError';
 
 const getAllStudents = catchAsync(async (req, res) => {
-  const result = await StundentServices.getAllStudents(req.query);
+  const result = await StundentServices.getAllStudents();
+  handleResponse.sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Studdents Get successfully',
+    data: result,
+  });
+});
+
+const getStudentPaginationQuery = catchAsync(async (req, res) => {
+  const result = await StundentServices.getStudentPaginationQuery(req.query);
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -57,6 +67,7 @@ const deleteStudent = catchAsync(async (req, res) => {
 
 export const StudentController = {
   getAllStudents,
+  getStudentPaginationQuery,
   getSingleStudent,
   updateStudent,
   deleteStudent,

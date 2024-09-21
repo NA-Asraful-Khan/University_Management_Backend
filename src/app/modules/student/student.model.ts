@@ -104,7 +104,7 @@ const studentSchema = new Schema<StudentInterface, StudentMethodsModel>(
 // // Virtual Fiels
 
 studentSchema.virtual('fullName').get(function () {
-  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
+  return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
 });
 
 // // Middleware configuration
@@ -129,7 +129,6 @@ studentSchema.pre('aggregate', function (next) {
 // // Exclude password fields in Response
 studentSchema.methods.toJSON = function () {
   const obj = this.toObject({ virtuals: true });
-  delete obj.password;
   delete obj.isDeleted;
   return obj;
 };
