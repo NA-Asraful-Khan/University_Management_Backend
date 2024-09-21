@@ -95,6 +95,7 @@ const studentSchema = new Schema<StudentInterface, StudentMethodsModel>(
     },
   },
   {
+    timestamps: true,
     toJSON: {
       virtuals: true,
     },
