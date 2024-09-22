@@ -43,7 +43,23 @@ const createFaculty = catchAsync(async (req, res) => {
   });
 });
 
+const createAdmin = catchAsync(async (req, res) => {
+  const { password, admin: adminData } = req.body;
+  // Creating admin
+  if (!adminData) {
+    throw new AppError(403, 'Admin data are required');
+  }
+  const result = await UserServices.createAdmin(password, adminData);
+  handleResponse.sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: 'Admin created successfully',
+    data: result,
+  });
+});
+
 export const UserController = {
   createStudent,
   createFaculty,
+  createAdmin,
 };

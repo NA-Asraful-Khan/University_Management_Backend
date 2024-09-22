@@ -7,10 +7,15 @@ import { StudentModel } from '../student/student.model';
 import { UserInterface } from './user.interface';
 
 import { UserModel } from './user.model';
-import { generateFacultyId, generateStudentId } from './user.utils';
+import {
+  generateAdminId,
+  generateFacultyId,
+  generateStudentId,
+} from './user.utils';
 import httpStatus from 'http-status';
 import { TFaculty } from '../faculty/faculty.interface';
 import { FacultyModel } from '../faculty/faculty.model';
+import { AdminModel } from '../admin/admin.model';
 
 const createStudent = async (
   password: string,
@@ -101,7 +106,49 @@ const createFaculty = async (password: string, facultyData: TFaculty) => {
   }
 };
 
+const createAdmin = async (password: string, adminData: TFaculty) => {
+  //Create a User Object
+  const userData: Partial<UserInterface> = {};
+  //Use Default Password
+  userData.password = password || (config.default_password as string);
+
+  // set Faculty role
+  userData.role = 'admin';
+
+  //Auto Generate Id
+
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    userData.id = await generateAdminId();
+    //Create a User [Transaction One]
+    const newUser = await UserModel.create([userData], { session });
+
+    //create a student
+    if (!newUser.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create User');
+    }
+    adminData.id = newUser[0].id;
+    adminData.user = newUser[0]._id;
+    //Create a Student [Transaction Two]
+    const newAdmin = await AdminModel.create([adminData], { session });
+    if (!newAdmin.length) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create Admin');
+    }
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return newAdmin;
+  } catch (err) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new AppError(500, 'Error creating Admin');
+  }
+};
+
 export const UserServices = {
   createStudent,
   createFaculty,
+  createAdmin,
 };

@@ -1,8 +1,8 @@
 import { Schema, model } from 'mongoose';
 import { TUserName } from '../../interface/userName';
-import { FacultyMethodsModel, TFaculty } from './faculty.interface';
-import { Gender } from '../../constant/gender';
+import { AdminMethodModel, TAdmin } from './admin.interface';
 import { BloodGroup } from '../../constant/bloodgroup';
+import { Gender } from '../../constant/gender';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -23,7 +23,7 @@ const userNameSchema = new Schema<TUserName>({
   },
 });
 
-const facultySchema = new Schema<TFaculty, FacultyMethodsModel>(
+const adminSchema = new Schema<TAdmin, AdminMethodModel>(
   {
     id: {
       type: String,
@@ -79,11 +79,6 @@ const facultySchema = new Schema<TFaculty, FacultyMethodsModel>(
       required: [true, 'Permanent address is required'],
     },
     profileImg: { type: String, default: '' },
-    academicDepartment: {
-      type: Schema.Types.ObjectId,
-      required: [true, 'Acadcemic Department is required'],
-      ref: 'AcademicDepartment',
-    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -98,7 +93,7 @@ const facultySchema = new Schema<TFaculty, FacultyMethodsModel>(
 );
 
 // generating full name
-facultySchema.virtual('fullName').get(function () {
+adminSchema.virtual('fullName').get(function () {
   return (
     this?.name?.firstName +
     ' ' +
@@ -109,33 +104,26 @@ facultySchema.virtual('fullName').get(function () {
 });
 
 // filter out deleted documents
-facultySchema.pre('find', function (next) {
+adminSchema.pre('find', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
 
-facultySchema.pre('findOne', function (next) {
+adminSchema.pre('findOne', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
 });
 
-// facultySchema.pre('aggregate', function (next) {
-//   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
-//   next();
-// });
-// // Exclude password fields in Response
-facultySchema.methods.toJSON = function () {
+adminSchema.methods.toJSON = function () {
   const obj = this.toObject({ virtuals: true });
   delete obj.isDeleted;
   return obj;
 };
+
 //checking if user is already exist!
-facultySchema.statics.isUserExists = async function (id: string) {
-  const existingUser = await FacultyModel.findOne({ id: id });
+adminSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await AdminModel.findOne({ id });
   return existingUser;
 };
 
-export const FacultyModel = model<TFaculty, FacultyMethodsModel>(
-  'Faculty',
-  facultySchema,
-);
+export const AdminModel = model<TAdmin, AdminMethodModel>('Admin', adminSchema);
