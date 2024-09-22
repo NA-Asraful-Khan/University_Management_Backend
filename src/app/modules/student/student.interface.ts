@@ -1,6 +1,9 @@
 // 1. Create an interface representing a document in MongoDB.
 
 import { Model, Types } from 'mongoose';
+import { TGender } from '../../interface/gender';
+import { TUserName } from '../../interface/userName';
+import { TBloodGroup } from '../../interface/bloodgroup';
 
 export type Guardian = {
   fatherName: string;
@@ -9,12 +12,6 @@ export type Guardian = {
   motherName: string;
   motherOccupation: string;
   motherContactNo: string;
-};
-
-export type UserName = {
-  firstName: string;
-  middleName?: string;
-  lastName: string;
 };
 
 export type LocalGuardian = {
@@ -27,14 +24,14 @@ export type LocalGuardian = {
 export type StudentInterface = {
   id: string;
   user: Types.ObjectId;
-  name: UserName;
+  name: TUserName;
   password: string;
-  gender: 'male' | 'female';
+  gender: TGender;
   dateOfBirth?: string;
   email: string;
   contactNo: string;
   emergencyContactNo: string;
-  bloodGroup: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+  bloodGroup: TBloodGroup;
   presentAddress: string;
   permanentAddress: string;
   gurdian: Guardian;

@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { Gender } from '../../constant/gender';
+import { BloodGroup } from '../../constant/bloodgroup';
 
 // 1. UserName Zod Schema
 const userNameValidationSchema = z.object({
@@ -31,12 +33,12 @@ const createStudentValidationSchema = z.object({
     password: z.string().max(16).optional(),
     student: z.object({
       name: userNameValidationSchema,
-      gender: z.enum(['female', 'male']),
+      gender: z.enum([...Gender] as [string, ...string[]]),
       dateOfBirth: z.string().optional(),
       email: z.string().email(),
       contactNo: z.string(),
       emergencyContactNo: z.string(),
-      bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
+      bloodGroup: z.enum([...BloodGroup] as [string, ...string[]]),
       presentAddress: z.string(),
       permanentAddress: z.string(),
       gurdian: guardianValidationSchema,
@@ -80,13 +82,13 @@ const updateStudentValidationSchema = z.object({
       student: z
         .object({
           name: updateUserNameValidationSchema.optional(),
-          gender: z.enum(['female', 'male']).optional(),
+          gender: z.enum([...Gender] as [string, ...string[]]).optional(),
           dateOfBirth: z.string().optional(),
           email: z.string().email().optional(),
           contactNo: z.string().optional(),
           emergencyContactNo: z.string().optional(),
           bloodGroup: z
-            .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
+            .enum([...BloodGroup] as [string, ...string[]])
             .optional(),
           presentAddress: z.string().optional(),
           permanentAddress: z.string().optional(),

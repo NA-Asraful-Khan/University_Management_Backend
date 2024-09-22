@@ -5,10 +5,12 @@ import {
   LocalGuardian,
   StudentInterface,
   StudentMethodsModel,
-  UserName,
 } from './student.interface';
+import { TUserName } from '../../interface/userName';
+import { Gender } from '../../constant/gender';
+import { BloodGroup } from '../../constant/bloodgroup';
 // 2. Create a Schema corresponding to the document interface.
-const userNameSchema = new Schema<UserName>({
+const userNameSchema = new Schema<TUserName>({
   firstName: { type: String, required: true },
   middleName: { type: String },
   lastName: { type: String, required: true },
@@ -49,7 +51,7 @@ const studentSchema = new Schema<StudentInterface, StudentMethodsModel>(
     },
     gender: {
       type: String,
-      enum: ['female', 'male'],
+      enum: Gender,
       required: [true, 'Gender is required'],
     },
     dateOfBirth: { type: String },
@@ -61,7 +63,7 @@ const studentSchema = new Schema<StudentInterface, StudentMethodsModel>(
     },
     bloodGroup: {
       type: String,
-      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+      enum: BloodGroup,
       required: [true, 'Blood Group is required'],
     },
     presentAddress: {
