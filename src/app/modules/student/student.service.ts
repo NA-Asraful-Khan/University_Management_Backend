@@ -33,6 +33,13 @@ const getStudentPaginationQuery = async (query: Record<string, unknown>) => {
 };
 
 const getSingleStudent = async (id: string) => {
+  const checkStudentAndUserExist = await StudentModel.isUserExist(id);
+  if (!checkStudentAndUserExist) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Student with this Id Not Exist',
+    );
+  }
   const result = await StudentModel.findOne({ id: id })
     .populate('user')
     .populate('admissionSemester')
@@ -48,6 +55,13 @@ const updateStudent = async (
   id: string,
   payload: Partial<StudentInterface>,
 ) => {
+  const checkStudentAndUserExist = await StudentModel.isUserExist(id);
+  if (!checkStudentAndUserExist) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Student with this Id Not Exist',
+    );
+  }
   const { name, gurdian, localGuardians, ...remainingStudentData } = payload;
 
   const modifiedUpdatedData: Record<string, unknown> = {
@@ -84,7 +98,6 @@ const updateStudent = async (
 };
 
 const deleteStudent = async (id: string) => {
-  const session = await mongoose.startSession();
   const checkStudentAndUserExist = await StudentModel.isUserExist(id);
   if (!checkStudentAndUserExist) {
     throw new AppError(
@@ -92,6 +105,8 @@ const deleteStudent = async (id: string) => {
       'Student with this Id Not Exist',
     );
   }
+  const session = await mongoose.startSession();
+
   try {
     session.startTransaction();
     const deletedStudent = await StudentModel.findOneAndUpdate(

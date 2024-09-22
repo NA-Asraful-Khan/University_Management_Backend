@@ -101,9 +101,9 @@ const facultySchema = new Schema<TFaculty, FacultyMethodsModel>(
 facultySchema.virtual('fullName').get(function () {
   return (
     this?.name?.firstName +
-    '' +
+    ' ' +
     this?.name?.middleName +
-    '' +
+    ' ' +
     this?.name?.lastName
   );
 });
@@ -126,7 +126,7 @@ facultySchema.pre('findOne', function (next) {
 
 //checking if user is already exist!
 facultySchema.statics.isUserExists = async function (id: string) {
-  const existingUser = await FacultyModel.findOne({ id });
+  const existingUser = await FacultyModel.findOne({ id: id });
   return existingUser;
 };
 

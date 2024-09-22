@@ -11,7 +11,7 @@ const getAllStudents = catchAsync(async (req, res) => {
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Studdents Get successfully',
+    message: 'Students Get successfully',
     data: result,
   });
 });
