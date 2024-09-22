@@ -5,6 +5,7 @@ import { AcademicSemesterRoutes } from '../modules/academicSemester/academicSeme
 import { AcademicFacultyRoutes } from '../modules/academicFaculty/academicFaculty.route';
 import { AcademicDepertmentRoutes } from '../modules/academicDepertment/academicDepertment.route';
 import { FacultyRoutes } from '../modules/faculty/faculty.route';
+import { AdminRoutes } from '../modules/admin/admin.route';
 
 const router = Router();
 
@@ -12,6 +13,7 @@ const moduleRoutes = [
   { path: '/users', component: UserRoutes },
   { path: '/students', component: StudentRoutes },
   { path: '/faculty', component: FacultyRoutes },
+  { path: '/admin', component: AdminRoutes },
   { path: '/academic-semesters', component: AcademicSemesterRoutes },
   { path: '/academic-faculty', component: AcademicFacultyRoutes },
   { path: '/academic-depertment', component: AcademicDepertmentRoutes },
