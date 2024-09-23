@@ -1,15 +1,15 @@
-import { Types } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
-export type TPreRequisiteCourses = {
+export interface TPreRequisiteCourses extends Document {
   course: Types.ObjectId;
   isDeleted: boolean;
-};
+}
 
-export type TCourse = {
+export interface TCourse extends Document {
   title: string;
   prefix: string;
   code: string;
   credits: number;
   preRequisiteCourses: [];
   isDeleted: boolean;
-};
+}

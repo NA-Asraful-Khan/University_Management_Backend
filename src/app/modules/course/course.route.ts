@@ -1,21 +1,27 @@
 import express from 'express';
+
 import validateRequest from '../../middleware/validateRequest';
 import { CourseValidations } from './course.validation';
 import { CourseController } from './course.controller';
+
+const courseController = new CourseController();
 
 const router = express.Router();
 
 router.post(
   '/create-course',
   validateRequest(CourseValidations.createCourseValidationSchema),
-  CourseController.createCourse,
+  courseController.create.bind(courseController),
 );
 
-router.get('/', CourseController.getAllCourses);
-router.get('/pagination', CourseController.getCoursesbyPaginationQuery);
+router.get('/', courseController.findAll.bind(courseController));
+router.get(
+  '/pagination',
+  courseController.findPaginationQuery.bind(courseController),
+);
 
-router.get('/:courseId', CourseController.getSingleCourse);
+router.get('/:id', courseController.findById.bind(courseController));
 
-router.delete('/:courseId', CourseController.deleteCourse);
+router.delete('/:id', courseController.softDelete.bind(courseController));
 
 export const CourseRoutes = router;

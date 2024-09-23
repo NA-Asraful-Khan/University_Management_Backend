@@ -1,37 +1,15 @@
+import { BaseService } from '../base/base.service';
+import { AcademicFacultyRepository } from './academicFaculty.repository';
 import { TAcademicFaculty } from './academicFaculty.interface';
-import { AcademicFacultyModel } from './academicFaculty.model';
 
-const createAcademicFaculty = async (payload: TAcademicFaculty) => {
-  const result = await AcademicFacultyModel.create(payload);
+export class AcademicFacultyService extends BaseService<TAcademicFaculty> {
+  constructor() {
+    super(new AcademicFacultyRepository());
+  }
 
-  return result;
-};
-
-const getAllAcademicFaculties = async () => {
-  const result = await AcademicFacultyModel.find();
-  return result;
-};
-
-const getSingleAcademicFaculty = async (id: string) => {
-  const result = await AcademicFacultyModel.findById(id);
-  return result;
-};
-
-const updateAcademicFaculty = async (id: string, payload: TAcademicFaculty) => {
-  const result = await AcademicFacultyModel.findOneAndUpdate(
-    { _id: id },
-    payload,
-    {
-      new: true,
-    },
-  );
-
-  return result;
-};
-
-export const AcademicFacultyServices = {
-  createAcademicFaculty,
-  getAllAcademicFaculties,
-  getSingleAcademicFaculty,
-  updateAcademicFaculty,
-};
+  async findByFacultyId(facultyId: string): Promise<TAcademicFaculty | null> {
+    return (this.repository as AcademicFacultyRepository).findByFacultyId(
+      facultyId,
+    );
+  }
+}
