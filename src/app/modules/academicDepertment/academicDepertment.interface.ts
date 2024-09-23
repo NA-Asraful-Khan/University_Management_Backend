@@ -1,6 +1,6 @@
-import { Types } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
-export type TAcademicDepertment = {
+export interface TAcademicDepertment extends Document {
   name: string;
   academicFaculty: Types.ObjectId;
-};
+}

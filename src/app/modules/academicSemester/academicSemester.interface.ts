@@ -1,3 +1,5 @@
+import { Document } from 'mongoose';
+
 export type TMonths =
   | 'January'
   | 'February'
@@ -15,13 +17,13 @@ export type TMonths =
 export type TAcademicSemesterName = 'Autumn' | 'Summer' | 'Fall';
 export type TAcademicSemesterCode = '01' | '02' | '03';
 
-export type TAcademicSemester = {
+export interface TAcademicSemester extends Document {
   name: TAcademicSemesterName;
   code: TAcademicSemesterCode;
   year: string;
   startMonth: TMonths;
   endMonth: TMonths;
-};
+}
 
 export type TAcademicSemesterNameCodeMapper = {
   [key: string]: string;
