@@ -13,3 +13,8 @@ export interface TCourse extends Document {
   preRequisiteCourses: [TPreRequisiteCourses];
   isDeleted?: boolean;
 }
+
+export interface TCourseFaculty extends Document {
+  course: Types.ObjectId;
+  faculties: [Types.ObjectId];
+}

@@ -2,9 +2,13 @@ import express from 'express';
 
 import validateRequest from '../../middleware/validateRequest';
 import { CourseValidations } from './course.validation';
-import { CourseController } from './course.controller';
+import {
+  CourseController,
+  FacultiesWithCouresController,
+} from './course.controller';
 
 const courseController = new CourseController();
+const facultyWithCourse = new FacultiesWithCouresController();
 
 const router = express.Router();
 
@@ -26,6 +30,18 @@ router.patch(
   '/:id',
   validateRequest(CourseValidations.updateCourseValidationSchema),
   courseController.update.bind(courseController),
+);
+
+router.put(
+  '/:courseId/assign-faculties',
+  validateRequest(CourseValidations.assaignFacultiesWithCourseValidationSchema),
+  facultyWithCourse.assignFacultiesWithCourse.bind(facultyWithCourse),
+);
+
+router.delete(
+  '/:courseId/remove-faculties',
+  validateRequest(CourseValidations.assaignFacultiesWithCourseValidationSchema),
+  facultyWithCourse.removeFacultiesWithCourse.bind(facultyWithCourse),
 );
 
 router.delete('/:id', courseController.softDelete.bind(courseController));
