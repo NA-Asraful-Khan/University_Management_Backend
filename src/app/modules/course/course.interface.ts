@@ -2,7 +2,7 @@ import { Document, Types } from 'mongoose';
 
 export interface TPreRequisiteCourses extends Document {
   course: Types.ObjectId;
-  isDeleted: boolean;
+  isDeleted?: boolean;
 }
 
 export interface TCourse extends Document {
@@ -10,6 +10,6 @@ export interface TCourse extends Document {
   prefix: string;
   code: string;
   credits: number;
-  preRequisiteCourses: [];
-  isDeleted: boolean;
+  preRequisiteCourses: [TPreRequisiteCourses];
+  isDeleted?: boolean;
 }
