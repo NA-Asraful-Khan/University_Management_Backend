@@ -3,6 +3,10 @@
 import { TAcademicFaculty } from './academicFaculty.interface';
 import { BaseRoute } from '../base/base.route';
 import { AcademicFacultyController } from './academicFaculty.controller';
+import {
+  setDeleteNotAllowed,
+  setPatchNotAllowed,
+} from '../../routes/excludeRoute/excludeRoute';
 
 class AcademicFacultyRoute extends BaseRoute<TAcademicFaculty> {
   constructor() {
@@ -11,16 +15,12 @@ class AcademicFacultyRoute extends BaseRoute<TAcademicFaculty> {
 
   protected initializeRoutes(): void {
     const Controller = this.controller as AcademicFacultyController;
-
+    // overwrite Route || Create New Route
     this.router.get('/:facultyId', Controller.findByFacultyId);
 
-    // Exclude Method
-    this.router.delete('/:id', (req, res) => {
-      return res.status(403).json({
-        success: false,
-        message: 'Delete action is not allowed for Academic Faculty.',
-      });
-    });
+    // Exclude Route
+    setPatchNotAllowed(this.router);
+    setDeleteNotAllowed(this.router);
 
     super.initializeRoutes();
   }
