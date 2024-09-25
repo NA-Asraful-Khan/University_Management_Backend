@@ -25,7 +25,7 @@ export class AcademicFacultyController extends BaseController<TAcademicFaculty> 
         data: result,
       });
     } else {
-      throw new AppError(httpStatus.NOT_FOUND, 'Item not found');
+      throw new AppError(httpStatus.NOT_FOUND, 'Academic Faculty not found');
     }
   });
 }

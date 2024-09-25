@@ -1,43 +1,29 @@
-import express from 'express';
+// academicFaculty.route.ts
+
+import { TAcademicFaculty } from './academicFaculty.interface';
+import { BaseRoute } from '../base/base.route';
 import { AcademicFacultyController } from './academicFaculty.controller';
-import validateRequest from '../../middleware/validateRequest';
-import { AcademicFacultyValidation } from './academicFaculty.validation';
-const academicFacultyController = new AcademicFacultyController();
-const router = express.Router();
 
-router.post(
-  '/create-academic-faculty',
-  validateRequest(AcademicFacultyValidation.academicFacultyValidationSchema),
-  academicFacultyController.create.bind(academicFacultyController),
-);
+class AcademicFacultyRoute extends BaseRoute<TAcademicFaculty> {
+  constructor() {
+    super(new AcademicFacultyController());
+  }
 
-router.get(
-  '/',
-  academicFacultyController.findAll.bind(academicFacultyController),
-);
-router.get(
-  '/:facultyId',
-  academicFacultyController.findByFacultyId.bind(academicFacultyController),
-);
+  protected initializeRoutes(): void {
+    const Controller = this.controller as AcademicFacultyController;
 
-router.put(
-  '/:id',
-  academicFacultyController.update.bind(academicFacultyController),
-);
-router.patch(
-  '/:id',
-  academicFacultyController.softDelete.bind(academicFacultyController),
-);
+    this.router.get('/:facultyId', Controller.findByFacultyId);
 
-router.delete(
-  '/:id',
-  academicFacultyController.delete.bind(academicFacultyController),
-);
+    // Exclude Method
+    this.router.delete('/:id', (req, res) => {
+      return res.status(403).json({
+        success: false,
+        message: 'Delete action is not allowed for Academic Faculty.',
+      });
+    });
 
-// router.post('/', userController.create.bind(userController));
-// router.get('/', userController.findAll.bind(userController));
-// router.get('/:id', userController.findById.bind(userController));
-// router.put('/:id', userController.update.bind(userController));
-// router.delete('/:id', userController.delete.bind(userController));
+    super.initializeRoutes();
+  }
+}
 
-export const AcademicFacultyRoutes = router;
+export const academicFacultyRoutes = new AcademicFacultyRoute().router;

@@ -1,20 +1,22 @@
-import express from 'express';
-import validateRequest from '../../middleware/validateRequest';
-import { AcademicSemesterValidation } from './academicSemester.validation';
+import { BaseRoute } from '../base/base.route';
+import { TAcademicSemester } from './academicSemester.interface';
 import { AcademicSemesterController } from './academicSemester.controller';
 
-const router = express.Router();
-const Controller = new AcademicSemesterController();
-router.post(
-  '/create-academic-semester',
-  validateRequest(
-    AcademicSemesterValidation.createAcademicSemesterValidationSchema,
-  ),
-  Controller.create.bind(Controller),
-);
+class AcademicSemesterRoute extends BaseRoute<TAcademicSemester> {
+  constructor() {
+    super(new AcademicSemesterController());
+  }
 
-router.get('/', Controller.findAll.bind(Controller));
-router.get('/:id', Controller.findById.bind(Controller));
-router.put('/:id', Controller.update.bind(Controller));
+  protected initializeRoutes(): void {
+    // Exclude Method
+    this.router.delete('/:id', (req, res) => {
+      return res.status(403).json({
+        success: false,
+        message: 'Delete action is not allowed for Academic Semester.',
+      });
+    });
+    super.initializeRoutes();
+  }
+}
 
-export const AcademicSemesterRoutes = router;
+export const academicSemesterRoutes = new AcademicSemesterRoute().router;
