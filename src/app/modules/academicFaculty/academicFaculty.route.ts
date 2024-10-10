@@ -3,10 +3,7 @@
 import { TAcademicFaculty } from './academicFaculty.interface';
 import { BaseRoute } from '../base/base.route';
 import { AcademicFacultyController } from './academicFaculty.controller';
-import {
-  setDeleteNotAllowed,
-  setPatchNotAllowed,
-} from '../../routes/excludeRoute/excludeRoute';
+import { setMethodNotAllowed } from '../../routes/excludeRoute/excludeRoute';
 
 class AcademicFacultyRoute extends BaseRoute<TAcademicFaculty> {
   constructor() {
@@ -19,9 +16,18 @@ class AcademicFacultyRoute extends BaseRoute<TAcademicFaculty> {
     this.router.get('/:facultyId', Controller.findByFacultyId);
 
     // Exclude Route
-    setPatchNotAllowed(this.router);
-    setDeleteNotAllowed(this.router);
-
+    setMethodNotAllowed(
+      this.router,
+      'get',
+      '/pagination',
+      'Pagination action is not allowed for this resource.',
+    );
+    setMethodNotAllowed(
+      this.router,
+      'patch',
+      '/:id',
+      'Patch action is not allowed for this resource.',
+    );
     super.initializeRoutes();
   }
 }
