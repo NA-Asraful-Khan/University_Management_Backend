@@ -18,7 +18,7 @@ export class BaseRoute<T extends Document> {
     this.router.post('/', this.controller.create);
     this.router.get('/:id', this.controller.findById);
     this.router.get('/', this.controller.findAll);
-    this.router.get('/pagination', this.controller.findPaginationQuery);
+    this.router.get('/pagination/query', this.controller.findPaginationQuery);
     this.router.put('/:id', this.controller.update);
     this.router.patch('/:id', this.controller.update);
     this.router.delete('/:id', this.controller.softDelete);

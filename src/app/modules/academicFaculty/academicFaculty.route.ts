@@ -19,7 +19,7 @@ class AcademicFacultyRoute extends BaseRoute<TAcademicFaculty> {
     setMethodNotAllowed(
       this.router,
       'get',
-      '/pagination',
+      '/pagination/query',
       'Pagination action is not allowed for this resource.',
     );
     setMethodNotAllowed(

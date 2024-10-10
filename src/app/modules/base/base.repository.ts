@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Model, Document } from 'mongoose';
+import mongoose, { Model, Document } from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { baseConstant } from './base.constant';
 
@@ -25,7 +25,9 @@ export class BaseRepository<T extends Document> {
       .sort()
       .paginate()
       .fields();
-
+    if (query._id && !mongoose.Types.ObjectId.isValid(query._id as string)) {
+      throw new Error('Invalid Id');
+    }
     return await Query.modelQuery;
   }
   async update(id: string, data: Partial<T>): Promise<T | null> {

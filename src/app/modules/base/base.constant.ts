@@ -7,4 +7,5 @@ export const baseConstant = [
   'title',
   'prefix',
   'code',
+  'status',
 ];
