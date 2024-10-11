@@ -5,6 +5,7 @@ import { TCourse, TCourseFaculty } from './course.interface';
 import { CourseFacultyModel, CourseModel } from './course.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
+import { FacultyModel } from '../faculty/faculty.model';
 
 export class CourseRepository extends BaseRepository<TCourse> {
   constructor() {
@@ -97,22 +98,22 @@ export class CourseRepository extends BaseRepository<TCourse> {
       throw new AppError(httpStatus.BAD_REQUEST, 'Course Update Faild');
     }
   }
-
-  async assignFacultiesWithCourse(
-    id: string,
-    payload: Partial<TCourseFaculty>,
-  ): Promise<TCourse> {
-    const rerult = await CourseFacultyModel.findByIdAndUpdate(id, {
-      $addToSet: { faculties: { $each: payload } },
-    });
-    return rerult as unknown as Promise<TCourse>;
-  }
 }
 
 // Implement the extended repository
 export class FacultiesWithCourseRepository extends BaseRepository<TCourseFaculty> {
   constructor() {
     super(CourseFacultyModel);
+  }
+  async findAll(): Promise<TCourseFaculty[]> {
+    return this.model
+      .find()
+      .populate({
+        path: 'faculties',
+        select: '-_id name', // Include both _id and fullName from faculties
+      })
+      .populate('course', 'title') // Example: populate course with title
+      .exec();
   }
 
   async assignFacultiesWithCourse(
@@ -131,6 +132,24 @@ export class FacultiesWithCourseRepository extends BaseRepository<TCourseFaculty
         'Course With This Id Not Found',
       );
     }
+
+    // Check if all faculties exist
+    const existingFaculties = await FacultyModel.find({
+      _id: { $in: facultyObjectIds },
+    });
+
+    if (existingFaculties.length !== facultyObjectIds.length) {
+      const invalidFaculties = facultyObjectIds.filter(
+        (id) => !existingFaculties.some((faculty) => faculty._id.equals(id)),
+      );
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `The following faculty IDs do not exist: ${invalidFaculties.join(
+          ', ',
+        )}`,
+      );
+    }
+    // Update the course with faculties
     const result = await this.model.findOneAndUpdate(
       { course: new Types.ObjectId(courseId) },
       {
@@ -150,14 +169,34 @@ export class FacultiesWithCourseRepository extends BaseRepository<TCourseFaculty
     const facultyObjectIds = payload.faculties.map(
       (id) => new Types.ObjectId(id),
     );
-    const checkCourse = await CourseModel.findById(courseId);
 
+    // Check if course exists
+    const checkCourse = await CourseModel.findById(courseId);
     if (!checkCourse) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         'Course With This Id Not Found',
       );
     }
+
+    // Check if all faculties exist
+    const existingFaculties = await FacultyModel.find({
+      _id: { $in: facultyObjectIds },
+    });
+
+    if (existingFaculties.length !== facultyObjectIds.length) {
+      const invalidFaculties = facultyObjectIds.filter(
+        (id) => !existingFaculties.some((faculty) => faculty._id.equals(id)),
+      );
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `The following faculty IDs do not exist: ${invalidFaculties.join(
+          ', ',
+        )}`,
+      );
+    }
+
+    // Remove the faculties from the course
     await this.model.findOneAndUpdate(
       { course: new Types.ObjectId(courseId) },
       {
@@ -165,8 +204,10 @@ export class FacultiesWithCourseRepository extends BaseRepository<TCourseFaculty
       },
     );
 
-    const result = this.model.find();
+    const result = await this.model.findOne({
+      course: new Types.ObjectId(courseId),
+    });
 
-    return result as unknown as Promise<TCourseFaculty>;
+    return result;
   }
 }

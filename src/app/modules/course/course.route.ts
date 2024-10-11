@@ -37,6 +37,10 @@ router.put(
   validateRequest(CourseValidations.assaignFacultiesWithCourseValidationSchema),
   facultyWithCourse.assignFacultiesWithCourse.bind(facultyWithCourse),
 );
+router.get(
+  '/:courseId/get-faculties',
+  facultyWithCourse.findAll.bind(facultyWithCourse),
+);
 
 router.delete(
   '/:courseId/remove-faculties',

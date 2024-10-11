@@ -67,11 +67,13 @@ OfferedCourseSchema.pre('save', async function (next) {
     academicDepartment,
     course,
     faculty,
+    section,
   } = this;
 
   // Fetch the semesterRegistration document to get academicSemester
-  const semesterRegistrationDoc =
-    await SemesterRegistrationModel.findById(semesterRegistration);
+  const semesterRegistrationDoc = await SemesterRegistrationModel.findById({
+    _id: semesterRegistration,
+  });
   if (!semesterRegistrationDoc) {
     throw new AppError(
       httpStatus.NOT_FOUND,
@@ -97,7 +99,33 @@ OfferedCourseSchema.pre('save', async function (next) {
     checkDocumentExists(CourseModel, course, 'Course'),
     checkDocumentExists(FacultyModel, faculty, 'Faculty'),
   ]);
+  // check if the department is belowng to the faculty
+  const isDepertmentBelongToFaculty = await AcademicDepartmentModel.findOne({
+    academicFaculty,
+    _id: academicDepartment,
+  });
+  if (!isDepertmentBelongToFaculty) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Depertment ${academicDepartment} is not belong to this Faculty ${academicFaculty}`,
+    );
+  }
 
+  // check if the same course same section in some registered semester exists
+
+  const isSameOfferedCourseExistsWithSameRegSemWithSameSection =
+    await OfferedCourseModel.findOne({
+      semesterRegistration,
+      course,
+      section,
+    });
+
+  if (isSameOfferedCourseExistsWithSameRegSemWithSameSection) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      `Offered Course with same section is already exist!`,
+    );
+  }
   next();
 });
 
