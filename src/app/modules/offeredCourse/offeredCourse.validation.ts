@@ -5,7 +5,6 @@ const time12HourFormat = /^(0[1-9]|1[0-2]):([0-5][0-9]) (AM|PM)$/;
 const createOfferedCourseValidationSchema = z.object({
   body: z.object({
     semesterRegistration: z.string(),
-    academicSemester: z.string(),
     academicFaculty: z.string(),
     academicDepartment: z.string(),
     course: z.string(),

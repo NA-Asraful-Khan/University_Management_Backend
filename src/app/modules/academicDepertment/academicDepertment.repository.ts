@@ -1,9 +1,9 @@
 import { BaseRepository } from '../base/base.repository';
-import { TAcademicDepertment } from './academicDepertment.interface';
-import { AcademicDepertmentModel } from './academicDepertment.model';
+import { TAcademicDepartment } from './academicDepertment.interface';
+import { AcademicDepartmentModel } from './academicDepertment.model';
 
-export class AcademicDepertmentRepository extends BaseRepository<TAcademicDepertment> {
+export class AcademicDepartmentRepository extends BaseRepository<TAcademicDepartment> {
   constructor() {
-    super(AcademicDepertmentModel);
+    super(AcademicDepartmentModel);
   }
 }

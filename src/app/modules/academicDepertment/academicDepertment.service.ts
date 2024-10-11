@@ -1,9 +1,9 @@
 import { BaseService } from '../base/base.service';
-import { TAcademicDepertment } from './academicDepertment.interface';
-import { AcademicDepertmentRepository } from './academicDepertment.repository';
+import { TAcademicDepartment } from './academicDepertment.interface';
+import { AcademicDepartmentRepository } from './academicDepertment.repository';
 
-export class AcademicDepertmentService extends BaseService<TAcademicDepertment> {
+export class AcademicDepartmentService extends BaseService<TAcademicDepartment> {
   constructor() {
-    super(new AcademicDepertmentRepository());
+    super(new AcademicDepartmentRepository());
   }
 }

@@ -38,7 +38,7 @@ export type StudentInterface = {
   localGuardians: LocalGuardian;
   profileImg?: string;
   admissionSemester: Types.ObjectId;
-  academicDepertment: Types.ObjectId;
+  academicDepartment: Types.ObjectId;
   isDeleted?: boolean;
 };
 // For Creating Static Methods

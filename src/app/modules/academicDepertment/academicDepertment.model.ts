@@ -1,8 +1,9 @@
 import { model, Schema } from 'mongoose';
-import { TAcademicDepertment } from './academicDepertment.interface';
 import AppError from '../../errors/AppError';
+import { TAcademicDepartment } from './academicDepertment.interface';
+import { AcademicFacultyModel } from '../academicFaculty/academicFaculty.model';
 
-const academicDepertmentSchema = new Schema<TAcademicDepertment>(
+const academicDepartmentSchema = new Schema<TAcademicDepartment>(
   {
     name: {
       type: String,
@@ -20,21 +21,28 @@ const academicDepertmentSchema = new Schema<TAcademicDepertment>(
   },
 );
 
-academicDepertmentSchema.pre('save', async function (next) {
-  const isDepertmentExist = await AcademicDepertmentModel.findOne({
+academicDepartmentSchema.pre('save', async function (next) {
+  const isDepertmentExist = await AcademicDepartmentModel.findOne({
     name: this.name,
   });
 
   if (isDepertmentExist) {
     throw new AppError(404, 'Depertment already exists.');
   }
+
+  const isFacultyExist = await AcademicFacultyModel.findById({
+    _id: this.academicFaculty,
+  });
+  if (!isFacultyExist) {
+    throw new AppError(404, 'Academic Faculty Not Found');
+  }
   next();
 });
 
-academicDepertmentSchema.pre('findOneAndUpdate', async function (next) {
+academicDepartmentSchema.pre('findOneAndUpdate', async function (next) {
   const query = this.getQuery();
 
-  const isDepertmentExist = await AcademicDepertmentModel.findOne(query);
+  const isDepertmentExist = await AcademicDepartmentModel.findOne(query);
 
   if (!isDepertmentExist) {
     throw new AppError(404, 'Depertment Does not exists.');
@@ -42,7 +50,7 @@ academicDepertmentSchema.pre('findOneAndUpdate', async function (next) {
   next();
 });
 
-export const AcademicDepertmentModel = model<TAcademicDepertment>(
-  'AcademicDepertment',
-  academicDepertmentSchema,
+export const AcademicDepartmentModel = model<TAcademicDepartment>(
+  'AcademicDepartment',
+  academicDepartmentSchema,
 );

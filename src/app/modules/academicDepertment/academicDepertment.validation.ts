@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const academicDepertmentValidationSchema = z.object({
+const academicDepartmentValidationSchema = z.object({
   body: z.object({
     name: z.string({
       invalid_type_error: 'Namr Must Be String',
@@ -13,7 +13,7 @@ const academicDepertmentValidationSchema = z.object({
   }),
 });
 
-const UpdateAcademicDepertmentValidationSchema = z.object({
+const UpdateAcademicDepartmentValidationSchema = z.object({
   body: z.object({
     name: z
       .string({
@@ -30,7 +30,7 @@ const UpdateAcademicDepertmentValidationSchema = z.object({
   }),
 });
 
-export const AcademicDepertmentValidation = {
-  academicDepertmentValidationSchema,
-  UpdateAcademicDepertmentValidationSchema,
+export const AcademicDepartmentValidation = {
+  academicDepartmentValidationSchema,
+  UpdateAcademicDepartmentValidationSchema,
 };

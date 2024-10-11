@@ -87,9 +87,9 @@ const studentSchema = new Schema<StudentInterface, StudentMethodsModel>(
       type: Schema.Types.ObjectId,
       ref: 'AcademicSemester',
     },
-    academicDepertment: {
+    academicDepartment: {
       type: Schema.Types.ObjectId,
-      ref: 'AcademicDepertment',
+      ref: 'AcademicDepartment',
     },
     isDeleted: {
       type: Boolean,

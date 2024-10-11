@@ -10,7 +10,7 @@ export type Days =
 
 export interface TOfferedCourse extends Document {
   semesterRegistration: Types.ObjectId;
-  academicSemester: Types.ObjectId;
+  academicSemester?: Types.ObjectId;
   academicFaculty: Types.ObjectId;
   academicDepartment: Types.ObjectId;
   course: Types.ObjectId;

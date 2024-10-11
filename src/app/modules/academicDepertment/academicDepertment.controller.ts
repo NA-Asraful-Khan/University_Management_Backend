@@ -1,9 +1,9 @@
 import { BaseController } from '../base/base.controller';
-import { TAcademicDepertment } from './academicDepertment.interface';
-import { AcademicDepertmentService } from './academicDepertment.service';
+import { TAcademicDepartment } from './academicDepertment.interface';
+import { AcademicDepartmentService } from './academicDepertment.service';
 
-export class AcademicDepertmentController extends BaseController<TAcademicDepertment> {
+export class AcademicDepartmentController extends BaseController<TAcademicDepartment> {
   constructor() {
-    super(new AcademicDepertmentService());
+    super(new AcademicDepartmentService());
   }
 }

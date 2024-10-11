@@ -1,16 +1,16 @@
 import { BaseRoute } from '../base/base.route';
-import { AcademicDepertmentController } from './academicDepertment.controller';
-import { TAcademicDepertment } from './academicDepertment.interface';
-import { AcademicDepertmentValidation } from './academicDepertment.validation';
+import { AcademicDepartmentController } from './academicDepertment.controller';
+import { TAcademicDepartment } from './academicDepertment.interface';
+import { AcademicDepartmentValidation } from './academicDepertment.validation';
 
-class AcademicDepertmentRoute extends BaseRoute<TAcademicDepertment> {
+class AcademicDepartmentRoute extends BaseRoute<TAcademicDepartment> {
   constructor() {
-    super(new AcademicDepertmentController(), {
-      create: AcademicDepertmentValidation.academicDepertmentValidationSchema,
+    super(new AcademicDepartmentController(), {
+      create: AcademicDepartmentValidation.academicDepartmentValidationSchema,
       update:
-        AcademicDepertmentValidation.UpdateAcademicDepertmentValidationSchema,
+        AcademicDepartmentValidation.UpdateAcademicDepartmentValidationSchema,
     });
   }
 }
 
-export const AcademicDepertmentRoutes = new AcademicDepertmentRoute().router;
+export const AcademicDepartmentRoutes = new AcademicDepartmentRoute().router;
