@@ -1,6 +1,9 @@
 import mongoose, { model } from 'mongoose';
 import { TSemesterRegistration } from './semesterRegistration.interface';
-import { SemesterRegistrationStatus } from './semesterRegistration.constant';
+import {
+  RegistrationStatus,
+  SemesterRegistrationStatus,
+} from './semesterRegistration.constant';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import { AcademicSemesterModel } from '../academicSemester/academicSemester.model';
@@ -29,6 +32,20 @@ const semesterRegistrationSchema = new mongoose.Schema<TSemesterRegistration>(
 );
 
 semesterRegistrationSchema.pre('save', async function (next) {
+  const isThereAnyUpcomingOrOngoingSemester =
+    await SemesterRegistrationModel.findOne({
+      $or: [
+        { status: RegistrationStatus.UPCOMING },
+        { status: RegistrationStatus.ONGOING },
+      ],
+    });
+
+  if (isThereAnyUpcomingOrOngoingSemester) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `There is already a ${isThereAnyUpcomingOrOngoingSemester?.status} status exists`,
+    );
+  }
   const isAcademicSemesterExist = await AcademicSemesterModel.findById(
     this.academicSemester,
   );

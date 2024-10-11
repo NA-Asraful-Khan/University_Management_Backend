@@ -1,26 +1,16 @@
-import express from 'express';
-import validateRequest from '../../middleware/validateRequest';
-import { AcademicDepertmentValidation } from './academicDepertment.validation';
+import { BaseRoute } from '../base/base.route';
 import { AcademicDepertmentController } from './academicDepertment.controller';
+import { TAcademicDepertment } from './academicDepertment.interface';
+import { AcademicDepertmentValidation } from './academicDepertment.validation';
 
-const router = express.Router();
-const Controller = new AcademicDepertmentController();
-router.post(
-  '/create-academic-depertment',
-  validateRequest(
-    AcademicDepertmentValidation.academicDepertmentValidationSchema,
-  ),
-  Controller.create.bind(Controller),
-);
+class AcademicDepertmentRoute extends BaseRoute<TAcademicDepertment> {
+  constructor() {
+    super(new AcademicDepertmentController(), {
+      create: AcademicDepertmentValidation.academicDepertmentValidationSchema,
+      update:
+        AcademicDepertmentValidation.UpdateAcademicDepertmentValidationSchema,
+    });
+  }
+}
 
-router.get('/', Controller.findAll.bind(Controller));
-router.get('/:depertmentId', Controller.findById.bind(Controller));
-router.put(
-  '/:depertmentId',
-  validateRequest(
-    AcademicDepertmentValidation.UpdateAcademicDepertmentValidationSchema,
-  ),
-  Controller.update.bind(Controller),
-);
-
-export const AcademicDepertmentRoutes = router;
+export const AcademicDepertmentRoutes = new AcademicDepertmentRoute().router;
