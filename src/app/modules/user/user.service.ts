@@ -16,6 +16,8 @@ import httpStatus from 'http-status';
 import { TFaculty } from '../faculty/faculty.interface';
 import { FacultyModel } from '../faculty/faculty.model';
 import { AdminModel } from '../admin/admin.model';
+import { TAdmin } from '../admin/admin.interface';
+import { AcademicDepartmentModel } from '../academicDepertment/academicDepertment.model';
 
 const createStudent = async (
   password: string,
@@ -28,13 +30,29 @@ const createStudent = async (
 
   // set Student role
   userData.role = 'student';
-
+  //Check if the email is already Used
+  const checkStudentEmail = await StudentModel.findOne({
+    email: studentData.email,
+  });
+  if (checkStudentEmail) {
+    throw new AppError(httpStatus.CONFLICT, 'Email already exists');
+  }
   //Auto Generate Id
-
+  // Check if admissionSemester and academicDepartment exists or not
   const admissionSemester = await AcademicSemesterModel.findById(
     studentData.admissionSemester,
   );
 
+  if (!admissionSemester) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Admission Semester Not Found');
+  }
+  const academicDepartment = await AcademicDepartmentModel.findById(
+    studentData.academicDepartment,
+  );
+  if (!academicDepartment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Academic Department Not Found');
+  }
+  // Session Start
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
@@ -75,7 +93,19 @@ const createFaculty = async (password: string, facultyData: TFaculty) => {
   userData.role = 'faculty';
 
   //Auto Generate Id
-
+  const checkFacultyEmail = await FacultyModel.findOne({
+    email: facultyData.email,
+  });
+  if (checkFacultyEmail) {
+    throw new AppError(httpStatus.CONFLICT, 'Email already exists');
+  }
+  const academicDepartment = await AcademicDepartmentModel.findById(
+    facultyData.academicDepartment,
+  );
+  if (!academicDepartment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Academic Department Not Found');
+  }
+  // Session Start
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
@@ -106,7 +136,7 @@ const createFaculty = async (password: string, facultyData: TFaculty) => {
   }
 };
 
-const createAdmin = async (password: string, adminData: TFaculty) => {
+const createAdmin = async (password: string, adminData: TAdmin) => {
   //Create a User Object
   const userData: Partial<UserInterface> = {};
   //Use Default Password

@@ -5,8 +5,9 @@ import AppError from '../errors/AppError';
 import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import config from '../config';
+import { TUserRole } from '../modules/user/user.interface';
 
-const auth = () => {
+const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     // Auth
     const token = req.headers.authorization;
@@ -21,7 +22,11 @@ const auth = () => {
         throw new AppError(httpStatus.UNAUTHORIZED, 'You are Unauthorized');
       }
       // decoded Undefined
-
+      // check roles
+      const role = (decoded as JwtPayload).role;
+      if (requiredRoles && !requiredRoles.includes(role)) {
+        throw new AppError(httpStatus.UNAUTHORIZED, 'You are Unauthorized');
+      }
       req.user = decoded as JwtPayload;
       next();
     });

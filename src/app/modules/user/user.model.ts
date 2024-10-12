@@ -59,11 +59,11 @@ userSchema.statics.isPasswordMatched = async function (
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 // // Exclude password fields in Response
-userSchema.methods.toJSON = function () {
-  const obj = this.toObject({ virtuals: true });
-  delete obj.password;
-  delete obj.isDeleted;
-  return obj;
-};
+// userSchema.methods.toJSON = function () {
+//   const obj = this.toObject({ virtuals: true });
+//   // delete obj.password;
+//   // delete obj.isDeleted;
+//   return obj;
+// };
 // 3. Create a model using the schema.
 export const UserModel = model<UserInterface, TUserModel>('User', userSchema);
