@@ -68,6 +68,9 @@ OfferedCourseSchema.pre('save', async function (next) {
     course,
     faculty,
     section,
+    days,
+    startTime,
+    endTime,
   } = this;
 
   // Fetch the semesterRegistration document to get academicSemester
@@ -126,6 +129,32 @@ OfferedCourseSchema.pre('save', async function (next) {
       `Offered Course with same section is already exist!`,
     );
   }
+
+  //Get the schedules of the faculties
+  const assignedSchedules = await OfferedCourseModel.find({
+    semesterRegistration,
+    faculty,
+    days: { $in: days },
+  }).select('days startTime endTime');
+  const newSchedule = {
+    days,
+    startTime,
+    endTime,
+  };
+
+  assignedSchedules?.forEach((schedule) => {
+    const existingStartTime = new Date(`1970-01-01T${schedule?.startTime}`);
+    const existingEndTime = new Date(`1970-01-01T${schedule?.endTime}`);
+    const newStartTime = new Date(`1970-01-01T${newSchedule?.startTime}`);
+    const newEndTime = new Date(`1970-01-01T${newSchedule?.endTime}`);
+
+    if (newStartTime < existingEndTime && newEndTime > existingStartTime) {
+      throw new AppError(
+        httpStatus.CONFLICT,
+        `This Faculty is not available at that time! Choose other time or day`,
+      );
+    }
+  });
   next();
 });
 
