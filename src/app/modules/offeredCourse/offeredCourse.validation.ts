@@ -36,17 +36,13 @@ const createOfferedCourseValidationSchema = z.object({
 
 const updateOfferedCourseValidationSchema = z.object({
   body: z.object({
-    faculty: z.string().optional(),
-    maxCapacity: z.number().optional(),
-    days: z.enum([...DAYS] as [string, ...string[]]).optional(),
+    faculty: z.string(),
+    maxCapacity: z.number(),
+    days: z.array(z.enum([...DAYS] as [string, ...string[]])),
     startTime: z
       .string()
-      .regex(time24HourFormat, 'Invalid time format (hh:mm)')
-      .optional(),
-    endTime: z
-      .string()
-      .regex(time24HourFormat, 'Invalid time format (hh:mm)')
-      .optional(),
+      .regex(time24HourFormat, 'Invalid time format (hh:mm)'),
+    endTime: z.string().regex(time24HourFormat, 'Invalid time format (hh:mm)'),
   }),
 });
 export const OfferedCourseValidation = {

@@ -9,6 +9,7 @@ import { AcademicFacultyModel } from '../academicFaculty/academicFaculty.model';
 import { AcademicDepartmentModel } from '../academicDepertment/academicDepertment.model';
 import { CourseModel } from '../course/course.model';
 import { FacultyModel } from '../faculty/faculty.model';
+import { hasTimeConflict } from './offeredCourse.utils';
 
 const OfferedCourseSchema = new Schema<TOfferedCourse>(
   {
@@ -142,19 +143,61 @@ OfferedCourseSchema.pre('save', async function (next) {
     endTime,
   };
 
-  assignedSchedules?.forEach((schedule) => {
-    const existingStartTime = new Date(`1970-01-01T${schedule?.startTime}`);
-    const existingEndTime = new Date(`1970-01-01T${schedule?.endTime}`);
-    const newStartTime = new Date(`1970-01-01T${newSchedule?.startTime}`);
-    const newEndTime = new Date(`1970-01-01T${newSchedule?.endTime}`);
+  if (hasTimeConflict(assignedSchedules, newSchedule)) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'This faculty is not available at that time! Choose other time or day',
+    );
+  }
+  next();
+});
+OfferedCourseSchema.pre('findOneAndUpdate', async function (next) {
+  const query = this.getQuery();
+  const payload = this.getUpdate();
+  const { faculty, days, startTime, endTime } = payload as Pick<
+    TOfferedCourse,
+    'faculty' | 'days' | 'startTime' | 'endTime'
+  >; // Cast payload to TOfferedCourse type
+  const isOfferedCourseExists = await OfferedCourseModel.findById(query);
+  if (!isOfferedCourseExists) {
+    throw new AppError(httpStatus.CONFLICT, 'Offered Course does not exist');
+  }
 
-    if (newStartTime < existingEndTime && newEndTime > existingStartTime) {
-      throw new AppError(
-        httpStatus.CONFLICT,
-        `This Faculty is not available at that time! Choose other time or day`,
-      );
-    }
-  });
+  const isFacultyExists = await FacultyModel.findById(faculty);
+  if (!isFacultyExists) {
+    throw new AppError(httpStatus.CONFLICT, 'Faculty does not exist');
+  }
+
+  //Get the schedules of the faculties
+
+  const { semesterRegistration } = isOfferedCourseExists;
+  const semesterRegistrationStatus =
+    await SemesterRegistrationModel.findById(semesterRegistration);
+
+  if (semesterRegistrationStatus?.status !== 'UPCOMING') {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      `You Cannot Update this offered course as it is ${semesterRegistrationStatus?.status}`,
+    );
+  }
+
+  const assignedSchedules = await OfferedCourseModel.find({
+    semesterRegistration,
+    faculty,
+    days: { $in: days },
+  }).select('days startTime endTime');
+  const newSchedule = {
+    days,
+    startTime,
+    endTime,
+  };
+
+  if (hasTimeConflict(assignedSchedules, newSchedule)) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'This faculty is not available at that time! Choose other time or day',
+    );
+  }
   next();
 });
 

@@ -6,6 +6,8 @@ import { BaseRepository } from '../base/base.repository';
 import { TSemesterRegistration } from './semesterRegistration.interface';
 import { SemesterRegistrationModel } from './semesterRegistration.model';
 import { RegistrationStatus } from './semesterRegistration.constant';
+import mongoose from 'mongoose';
+import { OfferedCourseModel } from '../offeredCourse/offeredCourse.model';
 
 export class SemesterRegistrationRepository extends BaseRepository<TSemesterRegistration> {
   constructor() {
@@ -77,5 +79,42 @@ export class SemesterRegistrationRepository extends BaseRepository<TSemesterRegi
       new: true,
       runValidators: true,
     });
+  }
+
+  async delete(id: string): Promise<TSemesterRegistration | null> {
+    const currentSemester = await this.model.findById(id);
+    if (!currentSemester) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        `Semester with this id Not Found`,
+      );
+    }
+    if (currentSemester?.status !== 'UPCOMING') {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        `Can not delete Semester because it is already ${currentSemester?.status}`,
+      );
+    }
+    const session = await mongoose.startSession();
+
+    try {
+      session.startTransaction();
+      // First Transaction
+      await OfferedCourseModel.deleteMany({
+        semesterRegistration: { $eq: id },
+      });
+      //Second Transaction
+      // Second Transaction: Use `lean()` to return a plain JavaScript object
+      const deleteRegistrationSemester = await this.model
+        .findByIdAndDelete(id)
+        .lean<TSemesterRegistration>();
+      await session.commitTransaction();
+      await session.endSession();
+      return deleteRegistrationSemester;
+    } catch (error) {
+      await session.abortTransaction();
+      await session.endSession();
+      throw new AppError(500, 'Error Deleting faculty');
+    }
   }
 }
