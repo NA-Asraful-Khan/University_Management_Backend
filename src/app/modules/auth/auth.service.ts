@@ -2,6 +2,8 @@ import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import { UserModel } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
+import jwt from 'jsonwebtoken';
+import config from '../../config';
 
 const loginUser = async (payload: TLoginUser) => {
   const isUserExists = await UserModel.isUserExistsByCustomId(payload?.id);
@@ -32,7 +34,19 @@ const loginUser = async (payload: TLoginUser) => {
   ) {
     throw new AppError(httpStatus.FORBIDDEN, `Incorrect password`);
   }
-  return {};
+  // generate and return the JWT token
+
+  const jwtPayload = {
+    userId: isUserExists?.id,
+    role: isUserExists?.role,
+  };
+  const accessToken = jwt.sign(jwtPayload, config.jwt_secret as string, {
+    expiresIn: config.jwt_expiration_time,
+  });
+  return {
+    accessToken,
+    needsPasswordChange: isUserExists?.needsPasswordChange,
+  };
 };
 
 export const AuthServices = {
