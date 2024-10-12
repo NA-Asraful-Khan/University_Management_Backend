@@ -8,14 +8,20 @@ import mongoose from 'mongoose';
 import { UserModel } from '../user/user.model';
 
 const getAllFaculty = async () => {
-  const result = await FacultyModel.find().populate('user');
+  const result = await FacultyModel.find().populate({
+    path: 'user',
+    select: '-_id id role status', // Exclude _id from academicSemester
+  });
 
   return result;
 };
 
 const getFacultyByPaginationQuery = async (query: Record<string, unknown>) => {
   const facultyQuery = new QueryBuilder(
-    FacultyModel.find().populate('user'),
+    FacultyModel.find().populate({
+      path: 'user',
+      select: '-_id id role status', // Exclude _id from academicSemester
+    }),
     query,
   )
     .search(facultySearchableField)

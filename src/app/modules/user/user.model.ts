@@ -1,9 +1,9 @@
 import { Schema, model } from 'mongoose';
-import { UserInterface } from './user.interface';
+import { TUserModel, UserInterface } from './user.interface';
 import config from '../../config';
 import bcrypt from 'bcrypt';
 // 2. Create a Schema corresponding to the document interface.
-const userSchema = new Schema<UserInterface>(
+const userSchema = new Schema<UserInterface, TUserModel>(
   {
     id: {
       type: String,
@@ -48,6 +48,16 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.statics.isUserExistsByCustomId = async function (id: string) {
+  return await UserModel.findOne({ id });
+};
+
+userSchema.statics.isPasswordMatched = async function (
+  plainTextPassword,
+  hashedPassword,
+) {
+  return await bcrypt.compare(plainTextPassword, hashedPassword);
+};
 // // Exclude password fields in Response
 userSchema.methods.toJSON = function () {
   const obj = this.toObject({ virtuals: true });
@@ -56,4 +66,4 @@ userSchema.methods.toJSON = function () {
   return obj;
 };
 // 3. Create a model using the schema.
-export const UserModel = model<UserInterface>('User', userSchema);
+export const UserModel = model<UserInterface, TUserModel>('User', userSchema);
