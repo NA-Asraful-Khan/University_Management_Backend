@@ -4,6 +4,7 @@ import { handleResponse } from '../../utils/responseHandler';
 import { FacultyServices } from './faculty.service';
 
 const getAllFaculty = catchAsync(async (req, res) => {
+  console.log('Test', req.user);
   const result = await FacultyServices.getAllFaculty();
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.OK,

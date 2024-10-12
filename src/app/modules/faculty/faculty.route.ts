@@ -2,10 +2,11 @@ import express from 'express';
 import { FacultyControllers } from './faculty.controller';
 import validateRequest from '../../middleware/validateRequest';
 import { facultyValidations } from './faculty.validation';
+import auth from '../../middleware/auth';
 
 const route = express.Router();
 
-route.get('/', FacultyControllers.getAllFaculty);
+route.get('/', auth(), FacultyControllers.getAllFaculty);
 route.get('/pagination', FacultyControllers.getFacultyByPaginationQuery);
 route.get('/:facultyId', FacultyControllers.getSingleFaculty);
 route.patch(
