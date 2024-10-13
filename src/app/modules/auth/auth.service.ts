@@ -2,10 +2,10 @@ import httpStatus from 'http-status';
 import AppError from '../../errors/AppError';
 import { UserModel } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
-import jwt, { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import bcrypt from 'bcrypt';
-import { createToken } from './auth.utils';
+import { createToken, verifyToken } from './auth.utils';
 import { sendEmail } from '../../../sentEmail';
 
 const loginUser = async (payload: TLoginUser) => {
@@ -123,11 +123,7 @@ const refreshToken = async (token: string) => {
     throw new AppError(httpStatus.UNAUTHORIZED, 'You must be logged in');
   }
   // check if the token is valid
-  const decoded = jwt.verify(
-    token,
-    config.jwt_refresh_secret as string,
-  ) as JwtPayload;
-
+  const decoded = verifyToken(token, config.jwt_refresh_secret as string);
   const { userId, iat } = decoded;
 
   const isUserExists = await UserModel.isUserExistsByCustomId(userId);
@@ -242,7 +238,8 @@ const resetPassword = async (
   }
 
   // check if the token is valid
-  const decoded = jwt.verify(token, config.jwt_secret as string) as JwtPayload;
+
+  const decoded = verifyToken(token, config.jwt_secret as string);
 
   if (payload?.id !== decoded?.userId) {
     throw new AppError(httpStatus.FORBIDDEN, `Wrong Id Submitted`);

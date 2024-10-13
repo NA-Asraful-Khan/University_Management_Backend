@@ -2,6 +2,7 @@ import { Schema, model } from 'mongoose';
 import { TUserModel, UserInterface } from './user.interface';
 import config from '../../config';
 import bcrypt from 'bcrypt';
+import { UserStatus } from './user.constant';
 // 2. Create a Schema corresponding to the document interface.
 const userSchema = new Schema<UserInterface, TUserModel>(
   {
@@ -33,7 +34,7 @@ const userSchema = new Schema<UserInterface, TUserModel>(
     },
     status: {
       type: String,
-      enum: ['in-progress', 'blocked'],
+      enum: UserStatus,
       default: 'in-progress',
     },
     isDeleted: {

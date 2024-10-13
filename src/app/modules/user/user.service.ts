@@ -19,6 +19,8 @@ import { AdminModel } from '../admin/admin.model';
 import { TAdmin } from '../admin/admin.interface';
 import { AcademicDepartmentModel } from '../academicDepertment/academicDepertment.model';
 
+import { JwtPayload } from 'jsonwebtoken';
+
 const createStudent = async (
   password: string,
   studentData: StudentInterface,
@@ -179,8 +181,47 @@ const createAdmin = async (password: string, adminData: TAdmin) => {
   }
 };
 
+const getMe = async (payLoad: JwtPayload) => {
+  const { userId, role } = payLoad;
+  let result = null;
+  if (role === 'student') {
+    result = await StudentModel.findOne({ id: userId });
+  }
+  if (role === 'faculty') {
+    result = await FacultyModel.findOne({ id: userId });
+  }
+  if (role === 'admin') {
+    result = await AdminModel.findOne({ id: userId });
+  }
+  return result;
+};
+
+const changeStatus = async (id: string) => {
+  const userData = await UserModel.findOne({ id: id });
+
+  let updateStatus: { status: string } | undefined;
+
+  if (userData?.status === 'in-progress') {
+    updateStatus = { status: 'blocked' };
+  } else if (userData?.status === 'blocked') {
+    updateStatus = { status: 'in-progress' };
+  }
+
+  if (updateStatus) {
+    const result = await UserModel.findOneAndUpdate({ id }, updateStatus, {
+      new: true,
+    });
+    return result;
+  }
+
+  // If no status update is required, you can return the original user or handle it as needed
+  return userData;
+};
+
 export const UserServices = {
   createStudent,
   createFaculty,
   createAdmin,
+  getMe,
+  changeStatus,
 };

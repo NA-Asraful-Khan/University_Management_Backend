@@ -18,7 +18,7 @@ router.post(
 
 router.post(
   '/create-faculty',
-  auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
+  auth(USER_ROLE.admin),
   validateRequest(facultyValidations.createFacultyValidationSchema),
   UserController.createFaculty,
 );
@@ -27,6 +27,18 @@ router.post(
   '/create-admin',
   validateRequest(AdminValidations.createAdminValidationSchema),
   UserController.createAdmin,
+);
+
+router.get(
+  '/me',
+  auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
+  UserController.getMe,
+);
+
+router.post(
+  '/change-status/:id',
+  auth(USER_ROLE.admin),
+  UserController.changeStatus,
 );
 
 export const UserRoutes = router;
