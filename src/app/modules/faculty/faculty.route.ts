@@ -3,10 +3,11 @@ import { FacultyControllers } from './faculty.controller';
 import validateRequest from '../../middleware/validateRequest';
 import { facultyValidations } from './faculty.validation';
 import auth from '../../middleware/auth';
+import { USER_ROLE } from '../user/user.constant';
 
 const route = express.Router();
 
-route.get('/', auth(), FacultyControllers.getAllFaculty);
+route.get('/', auth(USER_ROLE.admin), FacultyControllers.getAllFaculty);
 route.get('/pagination', FacultyControllers.getFacultyByPaginationQuery);
 route.get('/:facultyId', FacultyControllers.getSingleFaculty);
 route.patch(

@@ -14,11 +14,15 @@ export interface UserInterface {
 
 export interface TUserModel extends Model<UserInterface> {
   isUserExistsByCustomId(id: string): Promise<UserInterface>;
-
   isPasswordMatched(
     plainTextPassword: string,
     hashedPassword: string,
   ): Promise<boolean>;
+
+  isJWTIssuedBeforePasswordChanged(
+    passwordChangedTimestamp: Date,
+    jwtIssuedTimestamp: number,
+  ): boolean;
 }
 
 export type TUserRole = keyof typeof USER_ROLE;

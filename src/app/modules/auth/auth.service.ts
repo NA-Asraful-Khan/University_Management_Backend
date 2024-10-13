@@ -54,7 +54,6 @@ const changePassword = async (
   userData: JwtPayload,
   payload: { oldPassword: string; newPassword: string },
 ) => {
-  console.log(userData);
   const isUserExists = await UserModel.isUserExistsByCustomId(userData?.userId);
 
   if (!isUserExists) {
@@ -75,7 +74,7 @@ const changePassword = async (
     throw new AppError(httpStatus.FORBIDDEN, `This user is Blocked!`);
   }
   // check if the password is incorrect
-  console.log(isUserExists);
+
   if (
     !(await UserModel.isPasswordMatched(
       payload?.oldPassword,
