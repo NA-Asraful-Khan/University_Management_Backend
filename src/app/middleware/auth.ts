@@ -53,7 +53,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
     ) {
       throw new AppError(
         httpStatus.UNAUTHORIZED,
-        'Your Password is Changed!, Please try to login again',
+        'Your Password is Changed!, Please Try Again!',
       );
     }
     if (requiredRoles && !requiredRoles.includes(role)) {

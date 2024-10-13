@@ -4,10 +4,20 @@ import { TAcademicFaculty } from './academicFaculty.interface';
 import { BaseRoute } from '../base/base.route';
 import { AcademicFacultyController } from './academicFaculty.controller';
 import { setMethodNotAllowed } from '../../routes/excludeRoute/excludeRoute';
+import { USER_ROLE } from '../user/user.constant';
+import { AcademicFacultyValidation } from './academicFaculty.validation';
 
 class AcademicFacultyRoute extends BaseRoute<TAcademicFaculty> {
   constructor() {
-    super(new AcademicFacultyController());
+    super(
+      new AcademicFacultyController(),
+      {
+        create: AcademicFacultyValidation.academicFacultyValidationSchema,
+        update: AcademicFacultyValidation.academicFacultyValidationSchema,
+      },
+      [USER_ROLE.admin],
+      [USER_ROLE.admin],
+    );
   }
 
   protected initializeRoutes(): void {

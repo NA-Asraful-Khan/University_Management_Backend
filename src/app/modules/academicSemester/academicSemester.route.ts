@@ -2,10 +2,22 @@ import { BaseRoute } from '../base/base.route';
 import { TAcademicSemester } from './academicSemester.interface';
 import { AcademicSemesterController } from './academicSemester.controller';
 import { setMethodNotAllowed } from '../../routes/excludeRoute/excludeRoute';
+import { AcademicSemesterValidation } from './academicSemester.validation';
+import { USER_ROLE } from '../user/user.constant';
 
 class AcademicSemesterRoute extends BaseRoute<TAcademicSemester> {
   constructor() {
-    super(new AcademicSemesterController());
+    super(
+      new AcademicSemesterController(),
+      {
+        create:
+          AcademicSemesterValidation.createAcademicSemesterValidationSchema,
+        update:
+          AcademicSemesterValidation.createAcademicSemesterValidationSchema,
+      },
+      [USER_ROLE.admin],
+      [USER_ROLE.admin],
+    );
   }
 
   protected initializeRoutes(): void {
