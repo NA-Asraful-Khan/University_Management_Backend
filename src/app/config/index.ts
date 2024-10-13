@@ -9,6 +9,7 @@ export default {
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,
   default_password: process.env.DEFAULT_PASS,
   node_env: process.env.NODE_ENV,
+  frontend_url: process.env.FRONTEND_URL,
   jwt_secret: process.env.JWT_ACCESS_SECRET,
   jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
   jwt_access_token_expiration_time:

@@ -30,6 +30,7 @@ const createStudent = async (
 
   // set Student role
   userData.role = 'student';
+  userData.email = studentData?.email;
   //Check if the email is already Used
   const checkStudentEmail = await StudentModel.findOne({
     email: studentData.email,
@@ -91,6 +92,7 @@ const createFaculty = async (password: string, facultyData: TFaculty) => {
 
   // set Faculty role
   userData.role = 'faculty';
+  userData.email = facultyData?.email;
 
   //Auto Generate Id
   const checkFacultyEmail = await FacultyModel.findOne({
@@ -144,7 +146,7 @@ const createAdmin = async (password: string, adminData: TAdmin) => {
 
   // set Faculty role
   userData.role = 'admin';
-
+  userData.email = adminData?.email;
   //Auto Generate Id
 
   const session = await mongoose.startSession();

@@ -7,13 +7,14 @@ import cookieParser from 'cookie-parser';
 import globalErrorHandler from './app/middleware/globalErrorHandler';
 import notFound from './app/middleware/notFound';
 import router from './app/routes';
+import config from './app/config';
 
 const app: Application = express();
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(cors());
+app.use(cors({ origin: [config.frontend_url as string], credentials: true }));
 
 //ApplicationRoute
 
