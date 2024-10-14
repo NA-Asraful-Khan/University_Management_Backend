@@ -14,7 +14,11 @@ const createStudent = catchAsync(async (req, res) => {
   if (!studentData) {
     throw new AppError(403, 'Student data are required');
   }
-  const result = await UserServices.createStudent(password, studentData);
+  const result = await UserServices.createStudent(
+    req.file,
+    password,
+    studentData,
+  );
 
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -32,7 +36,11 @@ const createFaculty = catchAsync(async (req, res) => {
   if (!facultyData) {
     throw new AppError(403, 'Faculty data are required');
   }
-  const result = await UserServices.createFaculty(password, facultyData);
+  const result = await UserServices.createFaculty(
+    req.file,
+    password,
+    facultyData,
+  );
 
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -44,11 +52,12 @@ const createFaculty = catchAsync(async (req, res) => {
 
 const createAdmin = catchAsync(async (req, res) => {
   const { password, admin: adminData } = req.body;
+
   // Creating admin
   if (!adminData) {
     throw new AppError(403, 'Admin data are required');
   }
-  const result = await UserServices.createAdmin(password, adminData);
+  const result = await UserServices.createAdmin(req.file, password, adminData);
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,

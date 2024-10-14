@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import config from '../../config';
 import AppError from '../../errors/AppError';
@@ -20,8 +21,10 @@ import { TAdmin } from '../admin/admin.interface';
 import { AcademicDepartmentModel } from '../academicDepertment/academicDepertment.model';
 
 import { JwtPayload } from 'jsonwebtoken';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 const createStudent = async (
+  file: any,
   password: string,
   studentData: StudentInterface,
 ) => {
@@ -60,6 +63,10 @@ const createStudent = async (
   try {
     session.startTransaction();
     userData.id = await generateStudentId(admissionSemester!);
+    //Sent Image To Cloudinary
+    const imageName = `${userData?.id}${studentData?.name?.firstName}`;
+    const path = file?.path;
+    const profileImage = await sendImageToCloudinary(imageName, path);
     //Create a User [Transaction One]
     const newUser = await UserModel.create([userData], { session });
 
@@ -69,6 +76,7 @@ const createStudent = async (
     }
     studentData.id = newUser[0].id;
     studentData.user = newUser[0]._id;
+    studentData.profileImg = profileImage as string;
     //Create a Student [Transaction Two]
     const newStudent = await StudentModel.create([studentData], { session });
     if (!newStudent.length) {
@@ -86,7 +94,11 @@ const createStudent = async (
   }
 };
 
-const createFaculty = async (password: string, facultyData: TFaculty) => {
+const createFaculty = async (
+  file: any,
+  password: string,
+  facultyData: TFaculty,
+) => {
   //Create a User Object
   const userData: Partial<UserInterface> = {};
   //Use Default Password
@@ -114,6 +126,10 @@ const createFaculty = async (password: string, facultyData: TFaculty) => {
   try {
     session.startTransaction();
     userData.id = await generateFacultyId();
+    //Sent Image To Cloudinary
+    const imageName = `${userData?.id}${facultyData?.name?.firstName}`;
+    const path = file?.path;
+    const profileImage = await sendImageToCloudinary(imageName, path);
     //Create a User [Transaction One]
     const newUser = await UserModel.create([userData], { session });
 
@@ -123,6 +139,7 @@ const createFaculty = async (password: string, facultyData: TFaculty) => {
     }
     facultyData.id = newUser[0].id;
     facultyData.user = newUser[0]._id;
+    facultyData.profileImg = profileImage as string;
     //Create a Student [Transaction Two]
     const newFaculty = await FacultyModel.create([facultyData], { session });
     if (!newFaculty.length) {
@@ -140,7 +157,7 @@ const createFaculty = async (password: string, facultyData: TFaculty) => {
   }
 };
 
-const createAdmin = async (password: string, adminData: TAdmin) => {
+const createAdmin = async (file: any, password: string, adminData: TAdmin) => {
   //Create a User Object
   const userData: Partial<UserInterface> = {};
   //Use Default Password
@@ -150,11 +167,24 @@ const createAdmin = async (password: string, adminData: TAdmin) => {
   userData.role = 'admin';
   userData.email = adminData?.email;
   //Auto Generate Id
-
+  userData.email = adminData?.email;
+  //Check if the email is already Used
+  const checkStudentEmail = await AdminModel.findOne({
+    email: adminData.email,
+  });
+  if (checkStudentEmail) {
+    throw new AppError(httpStatus.CONFLICT, 'Email already exists');
+  }
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
     userData.id = await generateAdminId();
+
+    //Sent Image To Cloudinary
+    const imageName = `${userData?.id}${adminData?.name?.firstName}`;
+    const path = file?.path;
+    const profileImage = await sendImageToCloudinary(imageName, path);
+
     //Create a User [Transaction One]
     const newUser = await UserModel.create([userData], { session });
 
@@ -164,6 +194,7 @@ const createAdmin = async (password: string, adminData: TAdmin) => {
     }
     adminData.id = newUser[0].id;
     adminData.user = newUser[0]._id;
+    adminData.profileImg = profileImage as string;
     //Create a Student [Transaction Two]
     const newAdmin = await AdminModel.create([adminData], { session });
     if (!newAdmin.length) {
