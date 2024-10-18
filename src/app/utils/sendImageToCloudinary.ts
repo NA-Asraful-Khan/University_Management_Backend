@@ -36,19 +36,18 @@ export const sendImageToCloudinary = (imageName: string, path: string) => {
         reject(error);
       });
   });
-  //   (async function () {
-  //
-
-  //     // Transform the image: auto-crop to square aspect_ratio
-  //     // const autoCropUrl = cloudinary.url('shoes', {
-  //     //   crop: 'auto',
-  //     //   gravity: 'auto',
-  //     //   width: 500,
-  //     //   height: 500,
-  //     // });
-
-  //     // console.log(autoCropUrl);
-  //   })();
+  /*
+    (async function () {
+      // Transform the image: auto-crop to square aspect_ratio
+      // const autoCropUrl = cloudinary.url('shoes', {
+      //   crop: 'auto',
+      //   gravity: 'auto',
+      //   width: 500,
+      //   height: 500,
+      // });
+      // console.log(autoCropUrl);
+    })();
+  */
 };
 
 const storage = multer.diskStorage({
