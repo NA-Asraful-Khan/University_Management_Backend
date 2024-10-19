@@ -33,7 +33,7 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
       })
       .populate({
         path: 'faculty',
-        select: 'fullName -_id', // Exclude _id from faculty
+        select: 'fullName name -_id', // Exclude _id from faculty
       })
       .select('-__v') // Exclude __v from the root document
       .exec();
