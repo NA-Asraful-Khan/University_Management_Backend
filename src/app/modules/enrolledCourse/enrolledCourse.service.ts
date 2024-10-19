@@ -41,8 +41,6 @@ const createEnrolledCourse = async (
   try {
     session.startTransaction();
 
-    console.log('Creating enrolled course...');
-
     // Create enrolled course
     const result = await EnrolledCourseModel.create(
       [
@@ -69,7 +67,6 @@ const createEnrolledCourse = async (
     }
 
     const maxCapacity = isOfferedCourseExist?.maxCapacity;
-    console.log('Max capacity before reduction:', maxCapacity);
 
     if (maxCapacity <= 0) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Max capacity already zero');
@@ -88,8 +85,6 @@ const createEnrolledCourse = async (
         'Failed to reduce capacity',
       );
     }
-
-    console.log('Max capacity after reduction:', reduceMaxCapacity.maxCapacity);
 
     await session.commitTransaction();
     await session.endSession();
