@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { Document } from 'mongoose';
 import { BaseRepository } from './base.repository';
+import { PaginationResult } from '../../interface/pagination';
 
 export class BaseService<T extends Document> {
   constructor(protected repository: BaseRepository<T>) {}
@@ -16,7 +17,9 @@ export class BaseService<T extends Document> {
   async findAll(): Promise<T[]> {
     return this.repository.findAll();
   }
-  async findPaginationQuery(query: Record<string, unknown>): Promise<T[]> {
+  async findPaginationQuery(
+    query: Record<string, unknown>,
+  ): Promise<PaginationResult<T>> {
     return this.repository.findPaginationQuery(query);
   }
 

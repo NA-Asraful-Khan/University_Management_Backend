@@ -2,6 +2,7 @@
 import mongoose, { Model, Document } from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { baseConstant } from './base.constant';
+import { PaginationResult } from '../../interface/pagination';
 
 export class BaseRepository<T extends Document> {
   constructor(protected model: Model<T>) {}
@@ -18,7 +19,9 @@ export class BaseRepository<T extends Document> {
     return this.model.find();
   }
 
-  async findPaginationQuery(query: Record<string, unknown>): Promise<T[]> {
+  async findPaginationQuery(
+    query: Record<string, unknown>,
+  ): Promise<PaginationResult<T>> {
     const Query = new QueryBuilder(this.model.find(), query)
       .search(baseConstant)
       .filter()
@@ -28,7 +31,9 @@ export class BaseRepository<T extends Document> {
     if (query._id && !mongoose.Types.ObjectId.isValid(query._id as string)) {
       throw new Error('Invalid Id');
     }
-    return await Query.modelQuery;
+    const result = await Query.modelQuery;
+    const pagination = await Query.countTotal();
+    return { result, pagination };
   }
   async update(id: string, data: Partial<T>): Promise<T | null> {
     return this.model.findByIdAndUpdate(id, data, { new: true });

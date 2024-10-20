@@ -7,7 +7,11 @@ import { USER_ROLE } from '../user/user.constant';
 
 const route = express.Router();
 
-route.get('/', auth(USER_ROLE.admin), FacultyControllers.getAllFaculty);
+route.get(
+  '/',
+  auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
+  FacultyControllers.getAllFaculty,
+);
 route.get('/pagination', FacultyControllers.getFacultyByPaginationQuery);
 route.get('/:facultyId', FacultyControllers.getSingleFaculty);
 route.patch(

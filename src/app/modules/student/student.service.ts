@@ -28,8 +28,11 @@ const getStudentPaginationQuery = async (query: Record<string, unknown>) => {
     .fields();
 
   const result = await studentQuery.modelQuery;
-
-  return result;
+  const pagination = await studentQuery.countTotal();
+  return {
+    result,
+    pagination,
+  };
 };
 
 const getSingleStudent = async (id: string) => {

@@ -7,6 +7,8 @@ import { StudentModel } from '../student/student.model';
 import mongoose from 'mongoose';
 import { SemesterRegistrationModel } from '../semesterRegistration/semesterRegistration.model';
 import { CourseModel } from '../course/course.model';
+import { FacultyModel } from '../faculty/faculty.model';
+import { calculateGradeAndPoints } from './enrolledCourse.utils';
 
 const createEnrolledCourse = async (
   userId: string,
@@ -145,13 +147,91 @@ const createEnrolledCourse = async (
     await session.abortTransaction();
     await session.endSession();
 
-    // Log detailed error for debugging
-    console.error('Error during course enrollment:', error);
-
     throw new AppError(500, 'Error Enrolling');
   }
 };
 
+const updateEnrolledCourseMarks = async (
+  facultyId: string,
+  payload: Partial<TEnrolledCourse>,
+) => {
+  const { semesterRegistration, offeredCourse, student, courseMarks } = payload;
+
+  const isSemesterRegistrationExist =
+    await SemesterRegistrationModel.findById(semesterRegistration);
+
+  if (!isSemesterRegistrationExist) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'Regestered Semester does not exist',
+    );
+  }
+
+  const isOfferedCourseExist = await OfferedCourseModel.findById(offeredCourse);
+
+  if (!isOfferedCourseExist) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Offered Course does not exist');
+  }
+
+  const isStudentExist = await StudentModel.findById(student);
+
+  if (!isStudentExist) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Student does not exist');
+  }
+  const faculty = await FacultyModel.findOne({ id: facultyId }, { _id: 1 });
+
+  if (!faculty) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Faculty does not exist');
+  }
+
+  const isCourseBelongToFaculty = await EnrolledCourseModel.findOne({
+    semesterRegistration,
+    offeredCourse,
+    student,
+    faculty: faculty?._id,
+  });
+
+  if (!isCourseBelongToFaculty) {
+    throw new AppError(httpStatus.FORBIDDEN, 'You are Unauthorized');
+  }
+
+  const modifiedData: Record<string, unknown> = {
+    ...courseMarks,
+  };
+
+  if (courseMarks?.finalTerm) {
+    const { classTest1, classTest2, midTerm, finalTerm } =
+      isCourseBelongToFaculty.courseMarks;
+
+    const totalMarks =
+      Math.ceil(classTest1) +
+      Math.ceil(midTerm) +
+      Math.ceil(classTest2) +
+      Math.ceil(finalTerm);
+
+    const result = calculateGradeAndPoints(totalMarks);
+
+    modifiedData.grade = result.grade;
+    modifiedData.gradePoints = result.gradePoints;
+    modifiedData.isCompleted = true;
+  }
+
+  if (courseMarks && Object.keys(courseMarks).length) {
+    for (const [key, value] of Object.entries(courseMarks)) {
+      modifiedData[`courseMarks.${key}`] = value;
+    }
+  }
+
+  const result = await EnrolledCourseModel.findByIdAndUpdate(
+    isCourseBelongToFaculty._id,
+    modifiedData,
+    { new: true },
+  );
+
+  return result;
+};
+
 export const EnrolledCourseServices = {
   createEnrolledCourse,
+  updateEnrolledCourseMarks,
 };
