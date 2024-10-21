@@ -39,6 +39,7 @@ export type StudentInterface = {
   profileImg?: string;
   admissionSemester: Types.ObjectId;
   academicDepartment: Types.ObjectId;
+  academicFaculty: Types.ObjectId;
   isDeleted?: boolean;
 };
 // For Creating Static Methods

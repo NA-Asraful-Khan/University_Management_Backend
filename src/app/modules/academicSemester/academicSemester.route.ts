@@ -15,8 +15,8 @@ class AcademicSemesterRoute extends BaseRoute<TAcademicSemester> {
         update:
           AcademicSemesterValidation.createAcademicSemesterValidationSchema,
       },
-      [USER_ROLE.admin],
-      [USER_ROLE.admin],
+      [USER_ROLE.superAdmin, USER_ROLE.admin],
+      [USER_ROLE.superAdmin, USER_ROLE.admin],
     );
   }
 

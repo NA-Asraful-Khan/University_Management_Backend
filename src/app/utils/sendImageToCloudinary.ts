@@ -7,7 +7,10 @@ cloudinary.config({
   api_key: '822688787237741',
   api_secret: 'BKXQZ4EG-VXtUZ68svBn5DnomEQ', // Click 'View API Keys' above to copy your API secret
 });
-export const sendImageToCloudinary = (imageName: string, path: string) => {
+export const sendImageToCloudinary = (
+  imageName: string,
+  path: string,
+): Promise<Record<string, unknown>> => {
   return new Promise((resolve, reject) => {
     cloudinary.uploader
       .upload(path, {
@@ -21,7 +24,7 @@ export const sendImageToCloudinary = (imageName: string, path: string) => {
           fetch_format: 'avif', // Ensure delivery in AVIF format
           quality: 'auto',
         });
-        resolve(optimizeUrl);
+        resolve({ url: optimizeUrl });
 
         // delete a file asynchronously
         fs.unlink(path, (err) => {

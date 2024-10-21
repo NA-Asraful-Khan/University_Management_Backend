@@ -58,15 +58,22 @@ const createStudent = async (
   if (!academicDepartment) {
     throw new AppError(httpStatus.NOT_FOUND, 'Academic Department Not Found');
   }
+
+  studentData.academicFaculty = academicDepartment.academicFaculty;
+
   // Session Start
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
     userData.id = await generateStudentId(admissionSemester!);
     //Sent Image To Cloudinary
-    const imageName = `${userData?.id}${studentData?.name?.firstName}`;
-    const path = file?.path;
-    const profileImage = await sendImageToCloudinary(imageName, path);
+    if (file) {
+      const imageName = `${userData?.id}${studentData?.name?.firstName}`;
+      const path = file?.path;
+      const { url } = await sendImageToCloudinary(imageName, path);
+
+      studentData.profileImg = url as string;
+    }
     //Create a User [Transaction One]
     const newUser = await UserModel.create([userData], { session });
 
@@ -76,7 +83,7 @@ const createStudent = async (
     }
     studentData.id = newUser[0].id;
     studentData.user = newUser[0]._id;
-    studentData.profileImg = profileImage as string;
+
     //Create a Student [Transaction Two]
     const newStudent = await StudentModel.create([studentData], { session });
     if (!newStudent.length) {
@@ -127,9 +134,12 @@ const createFaculty = async (
     session.startTransaction();
     userData.id = await generateFacultyId();
     //Sent Image To Cloudinary
-    const imageName = `${userData?.id}${facultyData?.name?.firstName}`;
-    const path = file?.path;
-    const profileImage = await sendImageToCloudinary(imageName, path);
+    if (file) {
+      const imageName = `${userData?.id}${facultyData?.name?.firstName}`;
+      const path = file?.path;
+      const { url } = await sendImageToCloudinary(imageName, path);
+      facultyData.profileImg = url as string;
+    }
     //Create a User [Transaction One]
     const newUser = await UserModel.create([userData], { session });
 
@@ -139,7 +149,7 @@ const createFaculty = async (
     }
     facultyData.id = newUser[0].id;
     facultyData.user = newUser[0]._id;
-    facultyData.profileImg = profileImage as string;
+
     //Create a Student [Transaction Two]
     const newFaculty = await FacultyModel.create([facultyData], { session });
     if (!newFaculty.length) {
@@ -181,10 +191,12 @@ const createAdmin = async (file: any, password: string, adminData: TAdmin) => {
     userData.id = await generateAdminId();
 
     //Sent Image To Cloudinary
-    const imageName = `${userData?.id}${adminData?.name?.firstName}`;
-    const path = file?.path;
-    const profileImage = await sendImageToCloudinary(imageName, path);
-
+    if (file) {
+      const imageName = `${userData?.id}${adminData?.name?.firstName}`;
+      const path = file?.path;
+      const { url } = await sendImageToCloudinary(imageName, path);
+      adminData.profileImg = url as string;
+    }
     //Create a User [Transaction One]
     const newUser = await UserModel.create([userData], { session });
 
@@ -194,7 +206,7 @@ const createAdmin = async (file: any, password: string, adminData: TAdmin) => {
     }
     adminData.id = newUser[0].id;
     adminData.user = newUser[0]._id;
-    adminData.profileImg = profileImage as string;
+
     //Create a Student [Transaction Two]
     const newAdmin = await AdminModel.create([adminData], { session });
     if (!newAdmin.length) {

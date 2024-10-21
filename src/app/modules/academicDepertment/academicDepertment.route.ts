@@ -13,8 +13,8 @@ class AcademicDepartmentRoute extends BaseRoute<TAcademicDepartment> {
         update:
           AcademicDepartmentValidation.UpdateAcademicDepartmentValidationSchema,
       },
-      [USER_ROLE.admin],
-      [USER_ROLE.admin],
+      [USER_ROLE.superAdmin, USER_ROLE.admin],
+      [USER_ROLE.superAdmin, USER_ROLE.admin],
     );
   }
 }

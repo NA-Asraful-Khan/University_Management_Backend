@@ -82,7 +82,7 @@ const studentSchema = new Schema<StudentInterface, StudentMethodsModel>(
       type: localGuardianSchema,
       required: [true, 'Local Guardians is required'],
     },
-    profileImg: { type: String },
+    profileImg: { type: String, default: '' },
     admissionSemester: {
       type: Schema.Types.ObjectId,
       ref: 'AcademicSemester',
@@ -90,6 +90,10 @@ const studentSchema = new Schema<StudentInterface, StudentMethodsModel>(
     academicDepartment: {
       type: Schema.Types.ObjectId,
       ref: 'AcademicDepartment',
+    },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicFaculty',
     },
     isDeleted: {
       type: Boolean,
