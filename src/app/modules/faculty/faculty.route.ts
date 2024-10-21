@@ -16,10 +16,15 @@ route.get('/pagination', FacultyControllers.getFacultyByPaginationQuery);
 route.get('/:facultyId', FacultyControllers.getSingleFaculty);
 route.patch(
   '/:facultyId',
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(facultyValidations.updateFacultyValidationSchema),
   FacultyControllers.updateFaculty,
 );
 
-route.delete('/:facultyId', FacultyControllers.deleteFaculty);
+route.delete(
+  '/:facultyId',
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
+  FacultyControllers.deleteFaculty,
+);
 
 export const FacultyRoutes = route;

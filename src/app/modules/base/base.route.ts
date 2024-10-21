@@ -57,7 +57,11 @@ export class BaseRoute<T extends Document> {
     this.router.get('/:id', this.controller.findById);
     this.router.get('/', this.controller.findAll);
     this.router.get('/pagination/query', this.controller.findPaginationQuery);
-    this.router.delete('softDelete/:id', this.controller.softDelete);
-    this.router.delete('/:id', this.controller.delete);
+    this.router.delete(
+      'softDelete/:id',
+      createAuth,
+      this.controller.softDelete,
+    );
+    this.router.delete('/:id', createAuth, this.controller.delete);
   }
 }

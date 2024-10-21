@@ -16,7 +16,7 @@ const router = express.Router();
 
 router.post(
   '/create-course',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(CourseValidations.createCourseValidationSchema),
   courseController.create.bind(courseController),
 );
@@ -31,14 +31,14 @@ router.get('/:id', courseController.findById.bind(courseController));
 
 router.patch(
   '/:id',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(CourseValidations.updateCourseValidationSchema),
   courseController.update.bind(courseController),
 );
 
 router.put(
   '/:courseId/assign-faculties',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(CourseValidations.assaignFacultiesWithCourseValidationSchema),
   facultyWithCourse.assignFacultiesWithCourse.bind(facultyWithCourse),
 );
@@ -49,14 +49,14 @@ router.get(
 
 router.delete(
   '/:courseId/remove-faculties',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   validateRequest(CourseValidations.assaignFacultiesWithCourseValidationSchema),
   facultyWithCourse.removeFacultiesWithCourse.bind(facultyWithCourse),
 );
 
 router.delete(
   '/:id',
-  auth(USER_ROLE.admin),
+  auth(USER_ROLE.admin, USER_ROLE.superAdmin),
   courseController.softDelete.bind(courseController),
 );
 
