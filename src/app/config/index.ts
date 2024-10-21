@@ -16,6 +16,9 @@ export default {
     process.env.JWT_ACCESS_TOKEN_EXPIRATION_TIME,
   jwt_refresh_token_expiration_time:
     process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME,
+  super_admin_password: process.env.SUPER_ADMIN_PASSWORD,
+  super_admin_email: process.env.SUPER_ADMIN_EMAIL,
+  super_admin_id: process.env.SUPER_ADMIN_ID,
   // google_oauth_client_id: process.env.GOOGLE_OAUTH_CLIENT_ID,
   // google_oauth_client_secret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
 };

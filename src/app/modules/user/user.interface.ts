@@ -8,7 +8,7 @@ export interface UserInterface {
   password: string;
   needsPasswordChange: boolean;
   passwordChangeAt?: Date;
-  role: 'admin' | 'student' | 'faculty';
+  role: 'admin' | 'student' | 'faculty' | 'super-admin';
   status: 'in-progress' | 'blocked';
   isDeleted: boolean;
 }
@@ -26,4 +26,4 @@ export interface TUserModel extends Model<UserInterface> {
   ): boolean;
 }
 
-export type TUserRole = keyof typeof USER_ROLE;
+export type TUserRole = (typeof USER_ROLE)[keyof typeof USER_ROLE];
