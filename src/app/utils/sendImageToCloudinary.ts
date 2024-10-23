@@ -49,6 +49,7 @@ export const sendImageToCloudinary = (
       //   height: 500,
       // });
       // console.log(autoCropUrl);
+      // console.log(autoCropUrl);
     })();
   */
 };
