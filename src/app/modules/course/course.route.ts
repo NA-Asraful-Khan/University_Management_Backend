@@ -44,7 +44,7 @@ router.put(
 );
 router.get(
   '/:courseId/get-faculties',
-  facultyWithCourse.findAll.bind(facultyWithCourse),
+  facultyWithCourse.getFacultiesWithCourse.bind(facultyWithCourse),
 );
 
 router.delete(

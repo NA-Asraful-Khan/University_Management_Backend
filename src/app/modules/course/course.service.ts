@@ -18,6 +18,11 @@ export class FacultiesWithCouresService extends BaseService<TCourseFaculty> {
     super(new FacultiesWithCourseRepository());
   }
 
+  async getFacultiesWithCourse(
+    courseId: string,
+  ): Promise<TCourseFaculty | null> {
+    return this.repository.findById(courseId);
+  }
   async assignFacultiesWithCourse(
     courseId: string,
     data: { faculties: string[] },

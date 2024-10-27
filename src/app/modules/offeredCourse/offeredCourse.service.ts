@@ -5,4 +5,8 @@ export class OfferedCourseService extends BaseService<TOfferedCourse> {
   constructor() {
     super(new OfferedCourseRepository());
   }
+
+  async myOfferedCourse(userId: string): Promise<TOfferedCourse[]> {
+    return (this.repository as OfferedCourseRepository).myOfferedCourse(userId);
+  }
 }

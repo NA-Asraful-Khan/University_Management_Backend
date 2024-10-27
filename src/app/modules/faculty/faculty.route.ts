@@ -9,7 +9,12 @@ const route = express.Router();
 
 route.get(
   '/',
-  auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
+  auth(
+    USER_ROLE.admin,
+    USER_ROLE.faculty,
+    USER_ROLE.student,
+    USER_ROLE.superAdmin,
+  ),
   FacultyControllers.getAllFaculty,
 );
 route.get('/pagination', FacultyControllers.getFacultyByPaginationQuery);

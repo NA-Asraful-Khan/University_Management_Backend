@@ -105,9 +105,9 @@ export class FacultiesWithCourseRepository extends BaseRepository<TCourseFaculty
   constructor() {
     super(CourseFacultyModel);
   }
-  async findAll(): Promise<TCourseFaculty[]> {
+  async findById(courseId: string): Promise<TCourseFaculty | null> {
     return this.model
-      .find()
+      .findOne({ course: courseId })
       .populate({
         path: 'faculties',
         select: '-_id name', // Include both _id and fullName from faculties

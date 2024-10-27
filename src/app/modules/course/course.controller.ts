@@ -18,6 +18,19 @@ export class FacultiesWithCouresController extends BaseController<TCourseFaculty
     super(new FacultiesWithCouresService());
   }
 
+  getFacultiesWithCourse = catchAsync(async (req, res): Promise<void> => {
+    const item = await this.service.findById(req.params.courseId);
+    if (item) {
+      handleResponse.sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Item retrieved successfully',
+        data: item,
+      });
+    } else {
+      throw new AppError(httpStatus.NOT_FOUND, 'Item not found');
+    }
+  });
   assignFacultiesWithCourse = catchAsync(async (req, res): Promise<void> => {
     const { courseId } = req.params;
     const { faculties } = req.body;
