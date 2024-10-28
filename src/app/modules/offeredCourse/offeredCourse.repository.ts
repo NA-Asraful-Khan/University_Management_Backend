@@ -56,12 +56,13 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
     if (!currentOngoingSemester) {
       throw new AppError(httpStatus.NOT_FOUND, 'No Ongoing Semester');
     }
-    const result = await OfferedCourseModel.aggregate([
+
+    const aggregationQuery = [
       {
         $match: {
           semesterRegistration: currentOngoingSemester?._id,
-          academicFaculty: student.academicFaculty,
-          academicDepartment: student.academicDepartment,
+          // academicFaculty: student?.academicFaculty,
+          academicDepartment: student?.academicDepartment,
         },
       },
       {
@@ -80,7 +81,7 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
           from: 'enrolledcourses',
           let: {
             currentOngoingSemester: currentOngoingSemester?._id,
-            currentStudentId: student._id,
+            currentStudent: student._id,
           },
           pipeline: [
             {
@@ -94,7 +95,7 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
                       ],
                     },
                     {
-                      $eq: ['$student', '$$currentStudentId'],
+                      $eq: ['$student', '$$currentStudent'],
                     },
                     {
                       $eq: ['$isEnrolled', true],
@@ -104,11 +105,59 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
               },
             },
           ],
-          as: 'enrolledCourse',
+          as: 'enrolledcourses',
+        },
+      },
+      {
+        $lookup: {
+          from: 'enrolledcourses',
+          let: {
+            currentStudent: student?._id,
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    {
+                      $eq: ['$student', '$$currentStudent'],
+                    },
+                    {
+                      $eq: ['$isCompleted', true],
+                    },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'completedCourses',
         },
       },
       {
         $addFields: {
+          completedCourseIds: {
+            $map: {
+              input: '$completedcourses',
+              as: 'completed',
+              in: '$$completed.course',
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          isPreRequisitesFulFilled: {
+            $or: [
+              { $eq: ['$course.preRequisiteCourses', []] },
+              {
+                $setIsSubset: [
+                  '$course.preRequisiteCourses.course',
+                  '$completedCourseIds',
+                ],
+              },
+            ],
+          },
+
           isAlreadyEnrolled: {
             $in: [
               '$course._id',
@@ -116,15 +165,22 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
                 $map: {
                   input: '$enrolledcourses',
                   as: 'enroll',
-                  in: '$$enroll.courses',
+                  in: '$$enroll.course',
                 },
               },
             ],
           },
         },
       },
-    ]);
+      {
+        $match: {
+          isAlreadyEnrolled: false,
+          isPreRequisitesFulFilled: true,
+        },
+      },
+    ];
 
+    const result = await OfferedCourseModel.aggregate([...aggregationQuery]);
     return result;
   }
 }
