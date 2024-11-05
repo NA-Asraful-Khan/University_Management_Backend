@@ -19,7 +19,8 @@ const getAdminsByPaginatedQuery = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Admins Get successfully',
-    data: result,
+    data: result.result,
+    pagination: result.pagination,
   });
 });
 

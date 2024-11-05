@@ -5,6 +5,7 @@ import { StudentModel } from '../student/student.model';
 import { TOfferedCourse } from './offeredCourse.interface';
 import { OfferedCourseModel } from './offeredCourse.model';
 import { SemesterRegistrationModel } from '../semesterRegistration/semesterRegistration.model';
+import { PaginationResult } from '../../interface/pagination';
 
 export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
   constructor() {
@@ -43,7 +44,10 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
       .exec();
   }
 
-  async myOfferedCourse(userId: string): Promise<TOfferedCourse[]> {
+  async myOfferedCourse(
+    userId: string,
+    query: Record<string, unknown>,
+  ): Promise<PaginationResult<TOfferedCourse>> {
     const student = await StudentModel.findOne({ id: userId });
 
     if (!student) {
@@ -56,7 +60,10 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
     if (!currentOngoingSemester) {
       throw new AppError(httpStatus.NOT_FOUND, 'No Ongoing Semester');
     }
-
+    //Pagination Setup
+    const page = Number(query?.page) || 1;
+    const limit = Number(query?.limit) || 10;
+    const skip = (page - 1) * limit;
     const aggregationQuery = [
       {
         $match: {
@@ -180,7 +187,25 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
       },
     ];
 
-    const result = await OfferedCourseModel.aggregate([...aggregationQuery]);
-    return result;
+    const paginationQuery = [
+      {
+        $skip: skip,
+      },
+      {
+        $limit: limit,
+      },
+    ];
+
+    const result = await OfferedCourseModel.aggregate([
+      ...aggregationQuery,
+      ...paginationQuery,
+    ]);
+
+    //Pagination Setup
+    const total = (await OfferedCourseModel.aggregate(aggregationQuery)).length;
+    const totalPage = Math.ceil(result.length / limit);
+    const pagination = { page, limit, total, totalPage };
+
+    return { result, pagination };
   }
 }

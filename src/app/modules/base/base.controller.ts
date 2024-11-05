@@ -50,11 +50,13 @@ export class BaseController<T extends Document> {
   findPaginationQuery = catchAsync(
     async (req: Request, res: Response): Promise<void> => {
       const items = await this.service.findPaginationQuery(req.query);
+
       handleResponse.sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: 'Items retrieved successfully',
-        data: items,
+        data: items.result,
+        pagination: items.pagination,
       });
     },
   );

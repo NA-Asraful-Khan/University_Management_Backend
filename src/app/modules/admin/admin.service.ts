@@ -22,7 +22,11 @@ const getAdminsByPaginatedQuery = async (query: Record<string, unknown>) => {
 
   const result = await adminQuery.modelQuery;
 
-  return result;
+  const pagination = await adminQuery.countTotal();
+  return {
+    result,
+    pagination,
+  };
 };
 
 const getSingleAdmin = async (id: string) => {

@@ -124,12 +124,11 @@ const createEnrolledCourse = async (
     if (maxCapacity <= 0) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Max capacity already zero');
     }
-
     // Reduce max capacity
     const reduceMaxCapacity = await OfferedCourseModel.findByIdAndUpdate(
       offeredCourse,
       { maxCapacity: maxCapacity - 1, faculty: isOfferedCourseExist?.faculty },
-      { session, new: true },
+      { new: true },
     );
 
     if (!reduceMaxCapacity) {
@@ -146,7 +145,6 @@ const createEnrolledCourse = async (
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
-
     throw new AppError(500, 'Error Enrolling');
   }
 };

@@ -15,6 +15,7 @@ export class OfferedCourseController extends BaseController<TOfferedCourse> {
 
     const result = await (this.service as OfferedCourseService).myOfferedCourse(
       userId,
+      req.query,
     );
 
     handleResponse.sendResponse(res, {
