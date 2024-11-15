@@ -17,6 +17,7 @@ class AcademicSemesterRoute extends BaseRoute<TAcademicSemester> {
       },
       [USER_ROLE.superAdmin, USER_ROLE.admin],
       [USER_ROLE.superAdmin, USER_ROLE.admin],
+      [USER_ROLE.superAdmin, USER_ROLE.admin],
     );
   }
 

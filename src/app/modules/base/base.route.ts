@@ -11,6 +11,7 @@ import { TUserRole } from '../user/user.interface';
 interface ValidationSchemas {
   create?: AnyZodObject;
   update?: AnyZodObject;
+  get?: AnyZodObject;
 }
 
 export class BaseRoute<T extends Document> {
@@ -21,6 +22,7 @@ export class BaseRoute<T extends Document> {
     private validationSchemas?: ValidationSchemas,
     private createRoles: TUserRole[] = [], // Add required roles for create
     private updateRoles: TUserRole[] = [], // Add required roles for update
+    private getRoles: TUserRole[] = [], // Add required roles for update
   ) {
     this.router = Router();
     this.initializeRoutes();
@@ -39,6 +41,12 @@ export class BaseRoute<T extends Document> {
       ? validateRequest(this.validationSchemas.update)
       : (req: Request, res: Response, next: NextFunction) => next();
 
+    // Use auth and validation for PUT/PATCH routes (update)
+    const getAuth = auth(...this.getRoles);
+    const getValidation = this.validationSchemas?.get
+      ? validateRequest(this.validationSchemas.get)
+      : (req: Request, res: Response, next: NextFunction) => next();
+
     this.router.post('/', createAuth, createValidation, this.controller.create);
     this.router.put(
       '/:id',
@@ -54,9 +62,14 @@ export class BaseRoute<T extends Document> {
     );
 
     // No validation or auth needed for the following routes
-    this.router.get('/:id', this.controller.findById);
-    this.router.get('/', this.controller.findAll);
-    this.router.get('/pagination/query', this.controller.findPaginationQuery);
+    this.router.get('/:id', getAuth, getValidation, this.controller.findById);
+    this.router.get('/', getAuth, getValidation, this.controller.findAll);
+    this.router.get(
+      '/pagination/query',
+      getAuth,
+      getValidation,
+      this.controller.findPaginationQuery,
+    );
     this.router.delete(
       'softDelete/:id',
       createAuth,
