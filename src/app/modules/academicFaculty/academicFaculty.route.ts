@@ -17,6 +17,7 @@ class AcademicFacultyRoute extends BaseRoute<TAcademicFaculty> {
       },
       [USER_ROLE.superAdmin, USER_ROLE.admin],
       [USER_ROLE.superAdmin, USER_ROLE.admin],
+      [USER_ROLE.superAdmin, USER_ROLE.admin],
     );
   }
 
@@ -26,12 +27,7 @@ class AcademicFacultyRoute extends BaseRoute<TAcademicFaculty> {
     this.router.get('/:facultyId', Controller.findByFacultyId);
 
     // Exclude Route
-    setMethodNotAllowed(
-      this.router,
-      'get',
-      '/pagination/query',
-      'Pagination action is not allowed for this resource.',
-    );
+
     setMethodNotAllowed(
       this.router,
       'patch',

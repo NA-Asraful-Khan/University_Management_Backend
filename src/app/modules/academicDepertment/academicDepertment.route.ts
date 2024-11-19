@@ -15,6 +15,7 @@ class AcademicDepartmentRoute extends BaseRoute<TAcademicDepartment> {
       },
       [USER_ROLE.superAdmin, USER_ROLE.admin],
       [USER_ROLE.superAdmin, USER_ROLE.admin],
+      [USER_ROLE.superAdmin, USER_ROLE.admin],
     );
   }
 }

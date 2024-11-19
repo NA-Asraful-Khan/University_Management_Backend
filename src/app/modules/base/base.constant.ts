@@ -12,4 +12,5 @@ export const baseConstant = [
   'year',
   'startMonth',
   'endMonth',
+  'academicFaculty.name',
 ];
