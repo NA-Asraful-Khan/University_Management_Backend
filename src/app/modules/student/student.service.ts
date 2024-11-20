@@ -14,7 +14,8 @@ const getAllStudents = async () => {
     .populate({
       path: 'academicDepartment',
       populate: { path: 'academicFaculty' },
-    });
+    })
+    .populate('academicFaculty');
 
   return result;
 };

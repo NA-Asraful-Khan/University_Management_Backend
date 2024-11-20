@@ -28,7 +28,7 @@ const createStudent = catchAsync(async (req, res) => {
   });
 });
 
-const createFaculty = catchAsync(async (req, res) => {
+const createFaculty: any = catchAsync(async (req, res) => {
   const { password, faculty: facultyData } = req.body;
 
   // Creating a new Faculty
