@@ -6,6 +6,9 @@ import { SemesterRegistrationModel } from './semesterRegistration.model';
 import { RegistrationStatus } from './semesterRegistration.constant';
 import mongoose from 'mongoose';
 import { OfferedCourseModel } from '../offeredCourse/offeredCourse.model';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { PaginationResult } from '../../interface/pagination';
+import { baseConstant } from '../base/base.constant';
 
 export class SemesterRegistrationRepository extends BaseRepository<TSemesterRegistration> {
   constructor() {
@@ -14,6 +17,29 @@ export class SemesterRegistrationRepository extends BaseRepository<TSemesterRegi
 
   async findAll(): Promise<TSemesterRegistration[]> {
     return this.model.find().populate('academicSemester');
+  }
+
+  async findPaginationQuery(
+    query: Record<string, unknown>,
+  ): Promise<PaginationResult<TSemesterRegistration>> {
+    const Query = new QueryBuilder(
+      this.model.find().populate({
+        path: 'academicSemester',
+        select: 'name year', // Exclude _id from academicSemester
+      }),
+      query,
+    )
+      .search(baseConstant)
+      .filter()
+      .sort()
+      .paginate()
+      .fields();
+    if (query._id && !mongoose.Types.ObjectId.isValid(query._id as string)) {
+      throw new Error('Invalid Id');
+    }
+    const result = await Query.modelQuery;
+    const pagination = await Query.countTotal();
+    return { result, pagination };
   }
 
   async update(

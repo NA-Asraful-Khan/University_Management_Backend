@@ -21,7 +21,17 @@ const getAllStudents = async () => {
 };
 
 const getStudentPaginationQuery = async (query: Record<string, unknown>) => {
-  const studentQuery = new QueryBuilder(StudentModel.find(), query)
+  const studentQuery = new QueryBuilder(
+    StudentModel.find()
+      .populate('user')
+      .populate('admissionSemester')
+      .populate({
+        path: 'academicDepartment',
+        populate: { path: 'academicFaculty' },
+      })
+      .populate('academicFaculty'),
+    query,
+  )
     .search(studentSearchableField)
     .filter()
     .sort()

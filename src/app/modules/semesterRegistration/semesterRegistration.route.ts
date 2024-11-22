@@ -15,8 +15,9 @@ class SemesterRegistrationRoute extends BaseRoute<TSemesterRegistration> {
         update:
           SemesterRegistrationValidation.updateSemesterRagistrationValidationSchema,
       },
-      [USER_ROLE.admin],
-      [USER_ROLE.admin],
+      [USER_ROLE.superAdmin, USER_ROLE.admin],
+      [USER_ROLE.superAdmin, USER_ROLE.admin],
+      [USER_ROLE.superAdmin, USER_ROLE.admin],
     );
   }
 
