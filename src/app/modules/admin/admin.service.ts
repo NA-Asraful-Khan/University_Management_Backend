@@ -8,12 +8,12 @@ import mongoose from 'mongoose';
 import { UserModel } from '../user/user.model';
 
 const getAllAdmins = async () => {
-  const result = await AdminModel.find();
+  const result = await AdminModel.find().populate('user');
   return result;
 };
 
 const getAdminsByPaginatedQuery = async (query: Record<string, unknown>) => {
-  const adminQuery = new QueryBuilder(AdminModel.find(), query)
+  const adminQuery = new QueryBuilder(AdminModel.find().populate('user'), query)
     .search(AdminSearchableFields)
     .filter()
     .sort()
@@ -34,7 +34,7 @@ const getSingleAdmin = async (id: string) => {
   if (!checkAdminAndUserExist) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Admin with this Id Not Exist');
   }
-  const result = await AdminModel.findOne({ id: id });
+  const result = await AdminModel.findOne({ id: id }).populate('user');
   return result;
 };
 

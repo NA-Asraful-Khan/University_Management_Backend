@@ -8,20 +8,26 @@ import mongoose from 'mongoose';
 import { UserModel } from '../user/user.model';
 
 const getAllFaculty = async () => {
-  const result = await FacultyModel.find().populate({
-    path: 'user',
-    select: '-_id id role status', // Exclude _id from academicSemester
-  });
+  const result = await FacultyModel.find()
+    .populate({
+      path: 'user',
+      select: '-_id id role status', // Exclude _id from academicSemester
+    })
+    .populate('academicDepartment')
+    .populate('academicFaculty');
 
   return result;
 };
 
 const getFacultyByPaginationQuery = async (query: Record<string, unknown>) => {
   const facultyQuery = new QueryBuilder(
-    FacultyModel.find().populate({
-      path: 'user',
-      select: '-_id id role status', // Exclude _id from academicSemester
-    }),
+    FacultyModel.find()
+      .populate({
+        path: 'user',
+        select: '-_id id role status', // Exclude _id from academicSemester
+      })
+      .populate('academicDepartment')
+      .populate('academicFaculty'),
     query,
   )
     .search(facultySearchableField)
@@ -46,7 +52,10 @@ const getSingleFaculty = async (id: string) => {
       'Faculty with this Id Not Exist',
     );
   }
-  const result = await FacultyModel.findOne({ id: id }).populate('user');
+  const result = await FacultyModel.findOne({ id: id })
+    .populate('user')
+    .populate('academicDepartment')
+    .populate('academicFaculty');
 
   return result;
 };
