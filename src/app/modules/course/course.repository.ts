@@ -6,6 +6,9 @@ import { CourseFacultyModel, CourseModel } from './course.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import { FacultyModel } from '../faculty/faculty.model';
+import { PaginationResult } from '../../interface/pagination';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { baseConstant } from '../base/base.constant';
 
 export class CourseRepository extends BaseRepository<TCourse> {
   constructor() {
@@ -17,6 +20,29 @@ export class CourseRepository extends BaseRepository<TCourse> {
       populate: { path: 'preRequisiteCourses.course' },
     });
     return rerult as unknown as Promise<TCourse[]>;
+  }
+
+  async findPaginationQuery(
+    query: Record<string, unknown>,
+  ): Promise<PaginationResult<TCourse>> {
+    const Query = new QueryBuilder(
+      this.model.find().populate({
+        path: 'preRequisiteCourses.course',
+        populate: { path: 'preRequisiteCourses.course' },
+      }),
+      query,
+    )
+      .search(baseConstant)
+      .filter()
+      .sort()
+      .paginate()
+      .fields();
+    if (query._id && !mongoose.Types.ObjectId.isValid(query._id as string)) {
+      throw new Error('Invalid Id');
+    }
+    const result = await Query.modelQuery;
+    const pagination = await Query.countTotal();
+    return { result, pagination };
   }
   async update(id: string, payload: Partial<TCourse>): Promise<TCourse> {
     const { preRequisiteCourses, ...courseRemainingData } = payload;
@@ -110,7 +136,7 @@ export class FacultiesWithCourseRepository extends BaseRepository<TCourseFaculty
       .findOne({ course: courseId })
       .populate({
         path: 'faculties',
-        select: '-_id name', // Include both _id and fullName from faculties
+        select: 'id name ', // Include both _id and fullName from faculties
       })
       .populate('course', 'title') // Example: populate course with title
       .exec();
