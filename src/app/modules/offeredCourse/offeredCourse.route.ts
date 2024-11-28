@@ -15,6 +15,7 @@ class OfferedCourse extends BaseRoute<TOfferedCourse> {
       },
       [USER_ROLE.admin],
       [USER_ROLE.admin],
+      [USER_ROLE.admin],
     );
   }
 

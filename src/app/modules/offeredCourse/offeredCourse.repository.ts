@@ -6,6 +6,9 @@ import { TOfferedCourse } from './offeredCourse.interface';
 import { OfferedCourseModel } from './offeredCourse.model';
 import { SemesterRegistrationModel } from '../semesterRegistration/semesterRegistration.model';
 import { PaginationResult } from '../../interface/pagination';
+import QueryBuilder from '../../builder/QueryBuilder';
+import { baseConstant } from '../base/base.constant';
+import mongoose from 'mongoose';
 
 export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
   constructor() {
@@ -39,6 +42,84 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
       .populate({
         path: 'faculty',
         select: 'fullName name -_id', // Exclude _id from faculty
+      })
+      .select('-__v') // Exclude __v from the root document
+      .exec();
+  }
+
+  async findPaginationQuery(
+    query: Record<string, unknown>,
+  ): Promise<PaginationResult<TOfferedCourse>> {
+    const Query = new QueryBuilder(
+      this.model
+        .find()
+        .populate({
+          path: 'academicSemester',
+          select: 'name year -_id', // Exclude _id from academicSemester
+        })
+        .populate({
+          path: 'semesterRegistration',
+          select: 'status -_id',
+          populate: { path: 'academicSemester', select: 'name year -_id' }, // Exclude _id from semesterRegistration
+        })
+        .populate({
+          path: 'academicFaculty',
+          select: 'name -_id', // Exclude _id from academicFaculty
+        })
+        .populate({
+          path: 'academicDepartment',
+          select: 'name -_id', // Exclude _id from academicDepartment
+        })
+        .populate({
+          path: 'course',
+          select: 'title -_id', // Exclude _id from course
+        })
+        .populate({
+          path: 'faculty',
+          select: 'fullName name -_id', // Exclude _id from faculty
+        }),
+      query,
+    )
+      .search(baseConstant)
+      .filter()
+      .sort()
+      .paginate()
+      .fields();
+    if (query._id && !mongoose.Types.ObjectId.isValid(query._id as string)) {
+      throw new Error('Invalid Id');
+    }
+    const result = await Query.modelQuery;
+    const pagination = await Query.countTotal();
+    return { result, pagination };
+  }
+
+  async findById(id: string): Promise<TOfferedCourse | null> {
+    return this.model
+      .findById(id)
+      .populate({
+        path: 'academicSemester',
+        select: 'name year ', // Exclude _id from academicSemester
+      })
+      .populate({
+        path: 'semesterRegistration',
+        select: 'status ',
+        populate: { path: 'academicSemester', select: 'name year ' }, // Exclude _id from semesterRegistration
+      })
+      .populate({
+        path: 'academicFaculty',
+        select: 'name ', // Exclude _id from academicFaculty
+      })
+      .populate({
+        path: 'academicDepartment',
+        select: 'name ', // Exclude _id from academicDepartment
+      })
+      .populate({
+        path: 'course',
+        select: 'title ', // Exclude _id from course
+      })
+      .populate({
+        path: 'faculty',
+        select: 'fullName name ', // Exclude _id from faculty
       })
       .select('-__v') // Exclude __v from the root document
       .exec();
