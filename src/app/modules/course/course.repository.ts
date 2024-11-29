@@ -132,14 +132,10 @@ export class FacultiesWithCourseRepository extends BaseRepository<TCourseFaculty
     super(CourseFacultyModel);
   }
   async findById(courseId: string): Promise<TCourseFaculty | null> {
-    return this.model
-      .findOne({ course: courseId })
-      .populate({
-        path: 'faculties',
-        select: 'id name ', // Include both _id and fullName from faculties
-      })
-      .populate('course', 'title') // Example: populate course with title
-      .exec();
+    return this.model.findOne({ course: courseId }).populate({
+      path: 'faculties',
+      select: 'id name', // Include both _id and fullName from faculties
+    });
   }
 
   async assignFacultiesWithCourse(
