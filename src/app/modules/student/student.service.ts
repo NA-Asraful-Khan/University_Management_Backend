@@ -6,6 +6,8 @@ import httpStatus from 'http-status';
 import { StudentInterface } from './student.interface';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { studentSearchableField } from './student.constant';
+import { AcademicSemesterModel } from '../academicSemester/academicSemester.model';
+import { AcademicDepartmentModel } from '../academicDepertment/academicDepertment.model';
 
 const getAllStudents = async () => {
   const result = await StudentModel.find()
@@ -78,6 +80,23 @@ const updateStudent = async (
   }
   const { name, gurdian, localGuardians, ...remainingStudentData } = payload;
 
+  // Check if admissionSemester and academicDepartment exists or not
+  const admissionSemester = await AcademicSemesterModel.findById(
+    remainingStudentData.admissionSemester,
+  );
+
+  if (!admissionSemester) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Admission Semester Not Found');
+  }
+  const academicDepartment = await AcademicDepartmentModel.findById(
+    remainingStudentData.academicDepartment,
+  );
+  if (!academicDepartment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Academic Department Not Found');
+  }
+
+  remainingStudentData.academicFaculty = academicDepartment.academicFaculty;
+
   const modifiedUpdatedData: Record<string, unknown> = {
     ...remainingStudentData,
   };
@@ -108,6 +127,7 @@ const updateStudent = async (
       runValidators: true,
     },
   );
+
   return result;
 };
 
