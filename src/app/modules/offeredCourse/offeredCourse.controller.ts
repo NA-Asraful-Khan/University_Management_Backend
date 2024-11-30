@@ -13,7 +13,7 @@ export class OfferedCourseController extends BaseController<TOfferedCourse> {
   myOfferedCourse = catchAsync(async (req, res): Promise<void> => {
     const userId = req.user.userId;
 
-    const result = await (this.service as OfferedCourseService).myOfferedCourse(
+    const items = await (this.service as OfferedCourseService).myOfferedCourse(
       userId,
       req.query,
     );
@@ -22,7 +22,8 @@ export class OfferedCourseController extends BaseController<TOfferedCourse> {
       statusCode: httpStatus.OK,
       success: true,
       message: 'Faculties assigned to course successfully',
-      data: result,
+      data: items.result,
+      pagination: items.pagination,
     });
   });
 }

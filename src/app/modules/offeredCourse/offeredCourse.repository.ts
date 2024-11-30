@@ -162,6 +162,14 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
         },
       },
       {
+        $lookup: {
+          from: 'faculties',
+          localField: 'faculty',
+          foreignField: '_id',
+          as: 'faculty',
+        },
+      },
+      {
         $unwind: '$course',
       },
       {
