@@ -9,6 +9,7 @@ import { SemesterRegistrationModel } from '../semesterRegistration/semesterRegis
 import { CourseModel } from '../course/course.model';
 import { FacultyModel } from '../faculty/faculty.model';
 import { calculateGradeAndPoints } from './enrolledCourse.utils';
+import QueryBuilder from '../../builder/QueryBuilder';
 
 const createEnrolledCourse = async (
   userId: string,
@@ -145,8 +146,39 @@ const createEnrolledCourse = async (
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
+    console.log(error);
     throw new AppError(500, 'Error Enrolling');
   }
+};
+
+const getMyEnrolledCourses = async (
+  studentId: string,
+  query: Record<string, unknown>,
+) => {
+  const student = await StudentModel.findOne({ id: studentId });
+
+  if (!student) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Student not found !');
+  }
+
+  const enrolledCourseQuery = new QueryBuilder(
+    EnrolledCourseModel.find({ student: student._id }).populate(
+      'semesterRegistration academicSemester academicFaculty academicDepartment offeredCourse course student faculty',
+    ),
+    query,
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await enrolledCourseQuery.modelQuery;
+  const meta = await enrolledCourseQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
 };
 
 const updateEnrolledCourseMarks = async (
@@ -232,4 +264,5 @@ const updateEnrolledCourseMarks = async (
 export const EnrolledCourseServices = {
   createEnrolledCourse,
   updateEnrolledCourseMarks,
+  getMyEnrolledCourses,
 };

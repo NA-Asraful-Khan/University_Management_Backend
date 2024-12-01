@@ -174,7 +174,10 @@ OfferedCourseSchema.pre('findOneAndUpdate', async function (next) {
   const semesterRegistrationStatus =
     await SemesterRegistrationModel.findById(semesterRegistration);
 
-  if (semesterRegistrationStatus?.status !== 'UPCOMING') {
+  if (
+    semesterRegistrationStatus?.status !== 'UPCOMING' &&
+    semesterRegistrationStatus?.status !== 'ONGOING'
+  ) {
     throw new AppError(
       httpStatus.CONFLICT,
       `You Cannot Update this offered course as it is ${semesterRegistrationStatus?.status}`,
