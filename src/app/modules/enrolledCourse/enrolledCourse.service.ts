@@ -261,8 +261,49 @@ const updateEnrolledCourseMarks = async (
   return result;
 };
 
+const geFacultyCourses = async (
+  userId: string,
+  query: Record<string, unknown>,
+) => {
+  const faculty = await FacultyModel.findOne({ id: userId });
+
+  if (!faculty) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Faculty not found !');
+  }
+
+  const facultyCoruseQuery = new QueryBuilder(
+    EnrolledCourseModel.find(
+      { faculty: faculty._id },
+      '-faculty -academicSemester -academicFaculty',
+    ).populate([
+      { path: 'semesterRegistration' },
+      { path: 'offeredCourse' },
+      { path: 'course' },
+      { path: 'academicDepartment' },
+      {
+        path: 'student',
+        select: 'name fullName id _id', // Include only these fields
+      },
+    ]),
+    query,
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await facultyCoruseQuery.modelQuery;
+  const pagination = await facultyCoruseQuery.countTotal();
+
+  return {
+    pagination,
+    result,
+  };
+};
+
 export const EnrolledCourseServices = {
   createEnrolledCourse,
   updateEnrolledCourseMarks,
   getMyEnrolledCourses,
+  geFacultyCourses,
 };

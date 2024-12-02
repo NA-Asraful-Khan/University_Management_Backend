@@ -30,4 +30,10 @@ router.get(
   EnrolledCourseControlles.getMyEnrolledCourses,
 );
 
+router.get(
+  '/faculty-schedule',
+  auth(USER_ROLE.faculty),
+  EnrolledCourseControlles.getFacultyCourses,
+);
+
 export const EnrolledCourseRoutes = router;
