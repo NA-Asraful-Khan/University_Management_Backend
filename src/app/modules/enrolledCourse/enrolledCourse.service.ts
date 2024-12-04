@@ -162,9 +162,25 @@ const getMyEnrolledCourses = async (
   }
 
   const enrolledCourseQuery = new QueryBuilder(
-    EnrolledCourseModel.find({ student: student._id }).populate(
-      'semesterRegistration academicSemester academicFaculty academicDepartment offeredCourse course student faculty',
-    ),
+    EnrolledCourseModel.find({ student: student._id })
+
+      .populate({
+        path: 'academicSemester',
+        select: 'name year',
+      })
+      .populate({
+        path: 'course',
+        select: 'title code', // Exclude _id from course
+      })
+      .populate({
+        path: 'faculty',
+        select: 'fullName name ', // Exclude _id from faculty
+      })
+      .populate({
+        path: 'offeredCourse',
+        select: 'section days startTime endTime',
+      }),
+
     query,
   )
     .filter()
