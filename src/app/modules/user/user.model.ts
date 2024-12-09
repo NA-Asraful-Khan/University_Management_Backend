@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { TUserModel, UserInterface } from './user.interface';
 import config from '../../config';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { UserStatus } from './user.constant';
 // 2. Create a Schema corresponding to the document interface.
 const userSchema = new Schema<UserInterface, TUserModel>(

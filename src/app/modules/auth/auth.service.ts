@@ -4,7 +4,7 @@ import { UserModel } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 import { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { createToken, verifyToken } from './auth.utils';
 import { sendEmail } from '../../../sentEmail';
 
