@@ -9,5 +9,4 @@ export interface TDashboard extends Document {
   studentCount: string;
   totalCourse: string;
   totalOfferedCourse: string;
-  
 }

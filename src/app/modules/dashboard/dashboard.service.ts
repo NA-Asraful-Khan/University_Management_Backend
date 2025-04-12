@@ -19,8 +19,7 @@ const getAdminDashboard = async () => {
     adminCount: (await AdminModel.find()).length,
     facultyCount: (await FacultyModel.find()).length,
     studentCount: (await StudentModel.find()).length,
-    totalCourse: (await CourseModel.find()).length,
-    totalOfferedCourse: (await OfferedCourseModel.find()).length,
+    totalCourse: (await CourseModel.find()).length
   }
 
   return result;
