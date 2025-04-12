@@ -29,15 +29,13 @@ const getFacultyDashboard = async (facultyId: string,) => {
 const faculty = await FacultyModel.findOne({ id: facultyId });
 
   // return variable 
-  const studentCount = await EnrolledCourseModel.find(
-      { faculty: faculty?._id }
-    )
+  const studentCount = (await EnrolledCourseModel.find(
+      { faculty: faculty?._id })).length
   const totalOfferedCourse= (await OfferedCourseModel.find(
       { faculty: faculty?._id }
     )).length
   const result = {
     studentCount: studentCount,
-    totalCourse: (await CourseModel.find()).length,
     totalOfferedCourse: totalOfferedCourse,
   }
 

@@ -130,7 +130,6 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
     query: Record<string, unknown>,
   ): Promise<PaginationResult<TOfferedCourse>> {
     const student = await StudentModel.findOne({ id: userId });
-
     if (!student) {
       throw new AppError(httpStatus.NOT_FOUND, 'Student not found');
     }
@@ -145,11 +144,12 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
     const page = Number(query?.page) || 1;
     const limit = Number(query?.limit) || 10;
     const skip = (page - 1) * limit;
+
     const aggregationQuery = [
       {
         $match: {
           semesterRegistration: currentOngoingSemester?._id,
-          // academicFaculty: student?.academicFaculty,
+          academicFaculty: student?.academicFaculty,
           academicDepartment: student?.academicDepartment,
         },
       },
@@ -247,9 +247,9 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
               { $eq: ['$course.preRequisiteCourses', []] },
               {
                 $setIsSubset: [
-                  '$course.preRequisiteCourses.course',
-                  '$completedCourseIds',
-                ],
+                '$course.preRequisiteCourses.course',
+                { $ifNull: ['$completedCourseIds', []] }
+              ],
               },
             ],
           },
@@ -276,6 +276,8 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
       },
     ];
 
+   
+
     const paginationQuery = [
       {
         $skip: skip,
@@ -285,16 +287,18 @@ export class OfferedCourseRepository extends BaseRepository<TOfferedCourse> {
       },
     ];
 
+  
     const result = await OfferedCourseModel.aggregate([
       ...aggregationQuery,
       ...paginationQuery,
     ]);
 
+       
+
     //Pagination Setup
     const total = (await OfferedCourseModel.aggregate(aggregationQuery)).length;
     const totalPage = Math.ceil(result.length / limit);
     const pagination = { page, limit, total, totalPage };
-
     return { result, pagination };
   }
 }
