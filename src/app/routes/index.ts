@@ -11,6 +11,7 @@ import { offeredCourseRoutes } from '../modules/offeredCourse/offeredCourse.rout
 import { AcademicDepartmentRoutes } from '../modules/academicDepertment/academicDepertment.route';
 import { AuthRoutes } from '../modules/auth/auth.route';
 import { EnrolledCourseRoutes } from '../modules/enrolledCourse/enrolledCourse.route';
+import { DashboardRoutes } from '../modules/dashboard/dashboard.route';
 
 const router = Router();
 
@@ -27,6 +28,7 @@ const moduleRoutes = [
   { path: '/offered-course', component: offeredCourseRoutes },
   { path: '/auth', component: AuthRoutes },
   { path: '/enrolled-courses', component: EnrolledCourseRoutes },
+  { path: '/dashboard', component: DashboardRoutes },
 ];
 
 moduleRoutes.forEach(({ path, component }) => {

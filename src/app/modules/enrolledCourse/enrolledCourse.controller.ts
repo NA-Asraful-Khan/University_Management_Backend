@@ -59,7 +59,7 @@ const getFacultyCourses = catchAsync(async (req, res) => {
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Get Enrolled Course Successfully',
+    message: 'Get Faculty Schedule Successfully',
     data: result?.result,
     pagination: result?.pagination,
   });

@@ -14,7 +14,15 @@ const app: Application = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(cors({ origin: [config.frontend_url as string], credentials: true }));
+// app.use(cors({ origin: [config.frontend_url as string], credentials: true }));
+
+//! Accept Request from All Origin
+app.use(cors({
+  origin: (origin, callback) => {
+    callback(null, origin); // Reflect the origin back
+  },
+  credentials: true,
+}));
 
 //ApplicationRoute
 
