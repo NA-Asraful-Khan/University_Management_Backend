@@ -154,6 +154,7 @@ OfferedCourseSchema.pre('save', async function (next) {
 OfferedCourseSchema.pre('findOneAndUpdate', async function (next) {
   const query = this.getQuery();
   const payload = this.getUpdate();
+  console.log(payload)
   const { faculty, days, startTime, endTime } = payload as Pick<
     TOfferedCourse,
     'faculty' | 'days' | 'startTime' | 'endTime'
@@ -163,10 +164,10 @@ OfferedCourseSchema.pre('findOneAndUpdate', async function (next) {
     throw new AppError(httpStatus.CONFLICT, 'Offered Course does not exist');
   }
 
-  const isFacultyExists = await FacultyModel.findById(faculty);
-  if (!isFacultyExists) {
-    throw new AppError(httpStatus.CONFLICT, 'Faculty does not exist');
-  }
+  // const isFacultyExists = await FacultyModel.findById(faculty);
+  // if (!isFacultyExists) {
+  //   throw new AppError(httpStatus.CONFLICT, 'Faculty does not exist');
+  // }
 
   //Get the schedules of the faculties
 
