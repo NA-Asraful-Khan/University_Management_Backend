@@ -11,10 +11,21 @@ import config from './app/config';
 
 const app: Application = express();
 
+// Render terminates TLS in front of the container. Trust that proxy so
+// Secure cookies are actually set in production.
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(cors({ origin: [config.frontend_url as string], credentials: true }));
+const allowedOrigin = config.frontend_url?.replace(/\/$/, '');
+
+app.use(
+  cors({
+    origin: allowedOrigin,
+    credentials: true,
+  }),
+);
 
 //ApplicationRoute
 
