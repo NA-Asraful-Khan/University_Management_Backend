@@ -2,17 +2,18 @@ import nodemailer from 'nodemailer';
 import config from './app/config';
 export const sendEmail = async (to: string, html: string) => {
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: config.node_env === 'production', // true for port 465, false for other ports
+    host: config.smtp_host,
+    port: Number(config.smtp_port),
+    // Port 587 uses STARTTLS (secure: false). Port 465 uses implicit TLS.
+    secure: config.smtp_secure === 'true',
     auth: {
-      user: 'shikhork@gmail.com',
-      pass: 'dzih qotg owlp gcpi',
+      user: config.smtp_user,
+      pass: config.smtp_pass,
     },
   });
 
   await transporter.sendMail({
-    from: 'shikhork@gmail.com', // sender address
+    from: config.smtp_from, // sender address
     to, // list of receivers
     subject: 'Reset Password Link', // Subject line
     text: 'Reset Your Password', // plain text body

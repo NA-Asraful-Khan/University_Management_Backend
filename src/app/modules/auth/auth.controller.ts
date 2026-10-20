@@ -10,9 +10,13 @@ const loginUser = catchAsync(async (req, res) => {
   const result = await AuthServices.loginUser(req.body);
 
   const { refreshToken, accessToken, needsPasswordChange } = result;
+  const isProduction = config.node_env === 'production';
   res.cookie('refreshToken', refreshToken, {
-    secure: config.node_env === 'production',
+    secure: isProduction,
     httpOnly: true,
+    // Frontend and API are different Render hosts, so the cookie must
+    // be sent on cross-site requests.
+    sameSite: isProduction ? 'none' : 'lax',
   });
   handleResponse.sendResponse(res, {
     statusCode: httpStatus.OK,

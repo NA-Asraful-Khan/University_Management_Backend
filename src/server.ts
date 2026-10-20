@@ -9,7 +9,7 @@ async function main() {
   try {
     await mongoose.connect(config.database_url as string);
     seedSuperAdmin();
-    server = app.listen(config.port, () => {
+    server = app.listen(Number(config.port), '0.0.0.0', () => {
       console.log(
         `Example app running on port http://localhost:${config.port}/`,
       );
